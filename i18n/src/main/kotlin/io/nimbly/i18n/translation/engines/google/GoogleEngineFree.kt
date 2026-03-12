@@ -21,8 +21,6 @@ import io.nimbly.i18n.translation.engines.EEngine
 import io.nimbly.i18n.translation.engines.IEngine
 import io.nimbly.i18n.translation.engines.Translation
 import io.nimbly.i18n.util.nullIfEmpty
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.net.URLEncoder
 
 private val XXXXXXX_REGEX = Regex("\\(\\s?XXXXXXX\\s?\\)")
@@ -78,16 +76,16 @@ class GoogleEngineFree : IEngine {
         val con = openConnection(url)
         con.setRequestProperty("User-Agent", "Mozilla/5.0")
 
-        val input = BufferedReader(InputStreamReader(con.getInputStream(), "UTF-8"))
-        var inputLine: String?
-        val response = StringBuilder()
-
-        while ((input.readLine().also { inputLine = it }) != null) {
-            response.append(inputLine)
+        val response = con.getInputStream().bufferedReader(Charsets.UTF_8).use { input ->
+            val sb = StringBuilder()
+            var inputLine: String?
+            while ((input.readLine().also { inputLine = it }) != null) {
+                sb.append(inputLine)
+            }
+            sb.toString()
         }
-        input.close()
 
-        val parsed = parseResult(response.toString(), langFrom)
+        val parsed = parseResult(response, langFrom)
 
         val sentence3 = parsed?.translated
             ?.replace(XXXXXXX_REGEX, newlineChar)

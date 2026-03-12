@@ -21,7 +21,6 @@ import com.intellij.debugger.impl.PositionUtil
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl
 import com.intellij.openapi.module.ModuleUtilCore
-import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.TextRange
@@ -67,8 +66,7 @@ class TzCucumberStepReference(private val myStep: PsiElement, private val myRang
     }
 
     override fun resolve(): PsiElement? {
-        val result = multiResolve(true)
-        return if (result.size == 1) result[0].element else null
+        return multiResolve(true).singleOrNull()?.element
     }
 
     override fun getCanonicalText(): String {
@@ -155,11 +153,7 @@ class TzCucumberStepReference(private val myStep: PsiElement, private val myRang
 
     private class MyResolver : ResolveCache.PolyVariantResolver<TzCucumberStepReference> {
         override fun resolve(ref: TzCucumberStepReference, incompleteCode: Boolean): Array<ResolveResult> {
-
-            return ProgressManager.getInstance().runProcess<Array<ResolveResult>>({
-                    ref.multiResolveInner()
-                }, EmptyProgressIndicator()
-            )
+            return ref.multiResolveInner()
         }
     }
 

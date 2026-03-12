@@ -132,14 +132,14 @@ fun String.toCamelCase(locale: Locale): String {
         .split(" ")
     val camelCased = StringBuilder(words[0].lowercase(locale))
 
-    for (i in 1 until words.size) {
-        val word =
-            if (words[i].isUpperCase())
-                words[i]
+    for (word in words.drop(1)) {
+        val formatted =
+            if (word.isUpperCase())
+                word
             else
-                words[i].lowercase(locale)
-                    .replaceFirstChar { if (it.isLowerCase()) it.titlecase(locale) else it.toString() }
-        camelCased.append(word)
+                word.lowercase(locale)
+                    .replaceFirstChar { if (it.isLowerCase()) it.titlecase(locale) else it.uppercase() }
+        camelCased.append(formatted)
     }
 
     return camelCased.toString()

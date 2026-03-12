@@ -50,10 +50,10 @@ fun manageTripleClicTableSelection(table: GherkinTable, editor: Editor, offset: 
         if (first !== last) {
             var cells= first.psiCells
 
-            val firstCell = if (cells.size > index) cells[index] else null
+            val firstCell = cells.getOrNull(index)
             cells = last.psiCells
 
-            val lastCell = if (cells.size > index) cells[index] else null
+            val lastCell = cells.getOrNull(index)
             if (firstCell != null && lastCell != null) {
 
                 val start = editor.offsetToLogicalPosition(firstCell.previousPipe.textOffset+1)

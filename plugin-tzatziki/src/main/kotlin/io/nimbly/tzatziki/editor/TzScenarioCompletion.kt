@@ -88,7 +88,6 @@ class TzScenarioCompletion: CompletionContributor() {
         allSteps
             .filter { it.description != description}
             .groupBy { it.description }
-            .toSortedMap()
             .forEach { (stepDescription, items) ->
 
                 val otherStep = items.find { it.step != step }?.step
@@ -124,7 +123,7 @@ class TzScenarioCompletion: CompletionContributor() {
 
         //
         // Adapt and add other contributor's completions
-        val allStepDescriptions = allSteps.map { it.description }.toSet()
+        val allStepDescriptions = allSteps.mapTo(HashSet()) { it.description }
         resultSet.runRemainingContributors(parameters) { result ->
             var lookup = result.lookupElement
             val lookupString = result.lookupElement.lookupString

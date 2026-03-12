@@ -133,13 +133,7 @@ open class KotlinWrapper<T: Any>(
     val escapeForHtml: Boolean = true) {
 }
 
-fun String?.noblank(): String? {
-    if (this == null)
-        return null
-    if (this.isBlank())
-        return null
-    return this
-}
+fun String?.noblank(): String? = this?.takeIf { it.isNotBlank() }
 
 private val CONTENT_HEIGHT_REGEX = Regex("content[0-9]+")
 

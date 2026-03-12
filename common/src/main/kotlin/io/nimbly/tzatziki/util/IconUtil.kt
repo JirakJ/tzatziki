@@ -89,7 +89,7 @@ fun getScaleFactorToFit(original: Dimension?, toFit: Dimension?): Double {
     if (original != null && toFit != null) {
         val dScaleWidth = getScaleFactor(original.width, toFit.width)
         val dScaleHeight = getScaleFactor(original.height, toFit.height)
-        dScale = Math.min(dScaleHeight, dScaleWidth)
+        dScale = dScaleHeight.coerceAtMost(dScaleWidth)
     }
     return dScale
 }

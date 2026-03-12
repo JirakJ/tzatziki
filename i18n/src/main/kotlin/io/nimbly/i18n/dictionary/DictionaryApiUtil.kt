@@ -4,9 +4,7 @@ import com.google.gson.Gson
 import com.intellij.util.io.HttpRequests
 import com.intellij.util.proxy.CommonProxy
 import io.nimbly.i18n.util.nullIfEmpty
-import java.io.BufferedReader
 import java.io.IOException
-import java.io.InputStreamReader
 import java.net.URL
 import java.net.URLConnection
 import java.net.URLEncoder
@@ -37,16 +35,16 @@ private fun callUrlAndParseResult(word: String): DefinitionResult {
     val con = openConnection(url)
     con.setRequestProperty("User-Agent", "Mozilla/5.0")
 
-    val input = BufferedReader(InputStreamReader(con.getInputStream(), "UTF-8"))
-    var inputLine: String?
-    val response = StringBuilder()
-
-    while ((input.readLine().also { inputLine = it }) != null) {
-        response.append(inputLine)
+    val response = con.getInputStream().bufferedReader(Charsets.UTF_8).use { input ->
+        val sb = StringBuilder()
+        var inputLine: String?
+        while ((input.readLine().also { inputLine = it }) != null) {
+            sb.append(inputLine)
+        }
+        sb.toString()
     }
-    input.close()
 
-    val json = response.toString()
+    val json = response
 
     val gson = Gson()
     val results = gson.fromJson(json, Array<Word>::class.java)

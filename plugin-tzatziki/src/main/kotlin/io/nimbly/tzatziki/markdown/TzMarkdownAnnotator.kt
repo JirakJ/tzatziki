@@ -46,7 +46,7 @@ class   TzMarkdownAnnotator : Annotator {
 
         //
         // BOLD
-        val bolds: MutableMap<Int, Int> = HashMap(16)
+        val bolds = HashMap<Int, Int>(16)
         var matcher = BOLD_PATTERN.matcher(text)
         while (matcher.find()) {
             val from = element.textOffset + matcher.start(1)
@@ -59,7 +59,7 @@ class   TzMarkdownAnnotator : Annotator {
 
         //
         // BULLETS
-        val bullets: MutableSet<Int> = HashSet()
+        val bullets = HashSet<Int>()
         matcher = STAR_START_PATTERN.matcher(text)
         while (matcher.find()) {
             val group = matcher.group(1)
@@ -69,20 +69,23 @@ class   TzMarkdownAnnotator : Annotator {
         }
 
         //
-        // ITALIC
+        // ITALIC — early exit if no asterisks
+        if ('*' !in text) return
+
         var i = 0
         var star = -1
         while (i < text.length) {
-            if (bullets.contains(i)) {
+            if (i in bullets) {
                 star = -1
                 i++
                 continue
             }
             val c = text[i]
             if (c == '*') {
-                if (bolds.containsKey(i)) {
+                val boldLen = bolds[i]
+                if (boldLen != null) {
                     star = -1
-                    i += bolds[i]!!
+                    i += boldLen
                     continue
                 }
                 star =

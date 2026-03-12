@@ -137,7 +137,7 @@ private fun String.postTranslationCSV(): String {
             }
             sb.append("\n")
         }
-        return sb.trim().toString()
+        return sb.toString().trim()
     } catch (ignored: Exception) {
     }
     return this

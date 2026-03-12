@@ -45,7 +45,6 @@ class TzTagCompletion: CompletionContributor() {
         val filename = origin.containingFile.name
         allTags
             .filter {it.key != description}
-            .toSortedMap()
                 .forEach { (tagDescription, tag) ->
 
                 val other = tag.gtags.find { it.containingFile != origin }

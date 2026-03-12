@@ -134,12 +134,9 @@ open class JavaStepDefinitionCreator : AbstractStepDefinitionCreator() {
     }
 
     override fun validateNewStepDefinitionFileName(project: Project, name: String): Boolean {
-        if (name.length == 0) return false
+        if (name.isEmpty()) return false
         if (!Character.isJavaIdentifierStart(name[0])) return false
-        for (i in 1 until name.length) {
-            if (!Character.isJavaIdentifierPart(name[i])) return false
-        }
-        return true
+        return name.drop(1).all { Character.isJavaIdentifierPart(it) }
     }
 
     override fun getDefaultStepDefinitionFolderPath(step: GherkinStep): String {
@@ -216,7 +213,7 @@ open class JavaStepDefinitionCreator : AbstractStepDefinitionCreator() {
 
     protected fun buildStepDefinitionByStep(step: GherkinStep, file: PsiFile): PsiMethod {
         val annotationPackage = AnnotationPackageProvider().getAnnotationPackageFor(step)
-        val methodAnnotation = String.format("@%s.", annotationPackage)
+        val methodAnnotation = "@${annotationPackage}."
         val generator = snippetGenerator()
 
         var snippet: String // = generator.getSnippet(cucumberStep, FunctionNameGenerator(CamelCaseConcatenator()))

@@ -54,10 +54,9 @@ class TzTestsResultsAnnotator : Annotator {
         if (!TOGGLE_CUCUMBER_PL)
             return
 
-        if (element is GherkinStep) {
-            annotateStep(element, holder)
-        } else if (element is GherkinTableRowImpl) {
-            annotateRow(element, holder)
+        when (element) {
+            is GherkinStep -> annotateStep(element, holder)
+            is GherkinTableRowImpl -> annotateRow(element, holder)
         }
     }
 
@@ -68,12 +67,12 @@ class TzTestsResultsAnnotator : Annotator {
 
     private fun annotateRow(row: GherkinTableRow, holder: AnnotationHolder) {
         val results = TzTestRegistry.results
-        row.children
-            .filterIsInstance<GherkinTableCell>()
-            .forEach { cell ->
-                val tests = results[cell] ?: return@forEach
-                doAnnotateCommon(tests, cell, holder)
+        for (child in row.children) {
+            if (child is GherkinTableCell) {
+                val tests = results[child] ?: continue
+                doAnnotateCommon(tests, child, holder)
             }
+        }
     }
 
     private fun doAnnotateCommon(tests: Set<SMTestProxy>, element: GherkinPsiElement, holder: AnnotationHolder) {
