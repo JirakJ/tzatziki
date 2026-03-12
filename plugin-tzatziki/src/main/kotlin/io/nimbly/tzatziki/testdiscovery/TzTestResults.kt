@@ -64,7 +64,7 @@ object TzTestRegistry {
         this.activeResults = temp
     }
 
-    private fun highlight(element: GherkinPsiElement, tests: Set<SMTestProxy>): MutableList<TzHighlight> {
+    private fun highlight(element: GherkinPsiElement, tests: Set<SMTestProxy>): List<TzHighlight> {
 
         val highlights = mutableListOf<TzHighlight>()
         if (tests.isEmpty())
@@ -73,8 +73,9 @@ object TzTestRegistry {
         val document = element.getDocument()
             ?: return highlights
 
-        val editors = EditorFactory.getInstance().getEditors(document, element.project).toList().nullIfEmpty()
-            ?: return highlights
+        val editors = EditorFactory.getInstance().getEditors(document, element.project)
+        if (editors.isEmpty())
+            return highlights
 
         val what = if (element is GherkinTableCell) "step" else "example"
         val textKey: TextAttributesKey
@@ -116,7 +117,8 @@ object TzTestRegistry {
         // Add annotation
         editors.forEach { editor ->
             val range = element.bestRange()
-            highlights += TzHighlight(element.containingFile, editor.markupModel, editor.markupModel.addRangeHighlighter(
+            val markupModel = editor.markupModel
+            highlights += TzHighlight(element.containingFile, markupModel, markupModel.addRangeHighlighter(
                 textKey,
                 range.startOffset,
                 range.endOffset,
@@ -129,13 +131,11 @@ object TzTestRegistry {
     }
 
     fun clearHighlighters(file: PsiFile? = null) {
-        val h = mutableListOf<TzHighlight>()
-        h.addAll(highlighters)
-
-        h.filter { file == null || it.file == file }
-         .forEach {
-             it.model.removeHighlighter(it.highlight)
-             highlighters.remove(it)
+        highlighters.removeAll { h ->
+            if (file == null || h.file == file) {
+                h.model.removeHighlighter(h.highlight)
+                true
+            } else false
         }
     }
 

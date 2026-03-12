@@ -32,10 +32,10 @@ interface TranslationIcons {
                 iso = l ?: iso
             }
 
-            var icon = FLAGS[iso + scaleRatio]
-            if (icon != null) return icon
+            val cacheKey = iso + scaleRatio
+            FLAGS[cacheKey]?.let { return it }
 
-            try {
+            val icon = try {
                 var ico = IconLoader.findIcon("io/nimbly/i18n/icons/languages/svg/$iso.svg", TranslationIcons::class.java)
                 if (!ico.exists()) {
                     ico = IconLoader.findIcon("io/nimbly/i18n/icons/languages/svg/${iso.substringBefore("-")}.svg", TranslationIcons::class.java)
@@ -52,17 +52,19 @@ interface TranslationIcons {
                 if (ico == null)
                     throw NullPointerException()
                 ico = IconUtil.scale(ico, scaleRatio)
-                icon = ZIcon(locale, ico, true)
+                ZIcon(locale, ico, true)
             } catch (ignored: Throwable) {
                 val ticon = textToIcon(locale.uppercase(), (scaleRatio * 11f).toFloat(), -1, JBColor.GRAY)
-                icon = ZIcon(locale, ticon, false)
+                ZIcon(locale, ticon, false)
             }
-            FLAGS[iso + scaleRatio] = icon!!
+            FLAGS[cacheKey] = icon
 
             return icon
         }
 
-        private val FLAGS: MutableMap<String, ZIcon?> = HashMap()
+        private val FLAGS: MutableMap<String, ZIcon> = object : LinkedHashMap<String, ZIcon>(32, 0.75f, true) {
+            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, ZIcon>?) = size > 64
+        }
     }
 }
 

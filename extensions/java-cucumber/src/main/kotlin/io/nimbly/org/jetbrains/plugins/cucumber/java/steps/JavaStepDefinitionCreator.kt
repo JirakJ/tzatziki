@@ -300,7 +300,7 @@ open class JavaStepDefinitionCreator : AbstractStepDefinitionCreator() {
             val fileTemplate =
                 FileTemplateManager.getInstance(step.project).getCodeTemplate(fileTemplateDescriptor.fileName)
             var text = fileTemplate.text
-            text = text.replace("\${STEP_KEYWORD}", stepAnnotationName).replace("\${STEP_REGEXP}", "\"" + regexp + "\"")
+            text = text.replace("\${STEP_KEYWORD}", stepAnnotationName).replace("\${STEP_REGEXP}", "\"$regexp\"")
                 .replace("\${METHOD_NAME}", methodFromSnippet.name)
                 .replace("\${PARAMETERS}", methodFromSnippet.parameterList.text).replace("\${BODY}\n", "")
             text = processGeneratedStepDefinition(text, methodFromSnippet)

@@ -104,19 +104,20 @@ fun scale(source: Icon, factor: Float)
     = IconUtil.scale(source, null, factor)
 
 
-private var numberIcons: MutableMap<String, Icon> = HashMap()
+private val numberIcons: MutableMap<String, Icon> = object : LinkedHashMap<String, Icon>(64, 0.75f, true) {
+    override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Icon>?) = size > 128
+}
 fun getNumberIcon(index: Int, foreground: Color): Icon {
     val key = "$index/$foreground"
-    var icon = numberIcons[key]
-    if (icon == null) {
-        icon = addText(
-            if (index == 0) CommonIcons.COUNT_BASE_ZERO else CommonIcons.COUNT_BASE,
-            if (index == 0) "-" else ("" + index),
-            10f,
-            SwingConstants.CENTER,
-            foreground
-        )
-        numberIcons[key] = icon
+    return synchronized(numberIcons) {
+        numberIcons.getOrPut(key) {
+            addText(
+                if (index == 0) CommonIcons.COUNT_BASE_ZERO else CommonIcons.COUNT_BASE,
+                if (index == 0) "-" else "$index",
+                10f,
+                SwingConstants.CENTER,
+                foreground
+            )
+        }
     }
-    return icon
 }

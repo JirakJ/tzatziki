@@ -45,6 +45,13 @@ class KotlinSnippet : Snippet {
     }
 
     override fun escapePattern(pattern: String): String {
-        return pattern.replace("\\", "\\\\").replace("\"", "\\\"")
+        return buildString(pattern.length + 8) {
+            for (c in pattern) {
+                when (c) {
+                    '\\' -> append("\\\\")
+                    '"' -> append("\\\"")
+                    else -> append(c)
+                }
+            }
+        }
     }
-}

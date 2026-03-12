@@ -28,6 +28,7 @@ import java.net.URLEncoder
 private val XXXXXXX_REGEX = Regex("\\(\\s?XXXXXXX\\s?\\)")
 private val ZERO_WIDTH_SPACE_REGEX = Regex("\\u200b")
 private val NON_BREAKING_SPACE_REGEX = Regex("\\u00A0")
+private val CURLY_QUOTES_REGEX = Regex("[\u201C\u201D]")
 
 class GoogleEngineFree : IEngine {
 
@@ -60,7 +61,8 @@ class GoogleEngineFree : IEngine {
             else if (sentence.contains("\r")) "\r"
             else "\n"
 
-        val initialSpaces = sentence.split(newlineChar).map { it.length - it.trimStart().length }
+        val lines = sentence.split(newlineChar)
+        val initialSpaces = lines.map { it.length - it.trimStart().length }
         val containsQuotes = sentence.contains('"')
         val endWithReturn = sentence.endsWith(newlineChar)
 
@@ -78,7 +80,7 @@ class GoogleEngineFree : IEngine {
 
         val input = BufferedReader(InputStreamReader(con.getInputStream(), "UTF-8"))
         var inputLine: String?
-        val response = StringBuffer()
+        val response = StringBuilder()
 
         while ((input.readLine().also { inputLine = it }) != null) {
             response.append(inputLine)
@@ -96,7 +98,7 @@ class GoogleEngineFree : IEngine {
             .joinToString(newlineChar)
 
         if (containsQuotes) {
-            sentence4 = sentence4.replace("”", "\"").replace("“", "\"")
+            sentence4 = sentence4.replace(CURLY_QUOTES_REGEX, "\"")
         }
 
         if (endWithReturn) {

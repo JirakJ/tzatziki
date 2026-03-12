@@ -22,11 +22,11 @@ fun searchDefinition(
     }
 }
 
-private fun <E> List<E>.skipFirst(): List<E> {
+private fun <E> Array<E>.skipFirst(): List<E> {
     if (this.size < 2)
         return emptyList()
 
-    return this.subList(1, this.size - 1)
+    return this.asList().subList(1, this.size - 1)
 }
 
 private fun callUrlAndParseResult(word: String): DefinitionResult {
@@ -39,7 +39,7 @@ private fun callUrlAndParseResult(word: String): DefinitionResult {
 
     val input = BufferedReader(InputStreamReader(con.getInputStream(), "UTF-8"))
     var inputLine: String?
-    val response = StringBuffer()
+    val response = StringBuilder()
 
     while ((input.readLine().also { inputLine = it }) != null) {
         response.append(inputLine)
@@ -49,7 +49,7 @@ private fun callUrlAndParseResult(word: String): DefinitionResult {
     val json = response.toString()
 
     val gson = Gson()
-    val results = gson.fromJson(json, Array<Word>::class.java).toList()
+    val results = gson.fromJson(json, Array<Word>::class.java)
 
     val word = results.getOrNull(0)
         ?: return DefinitionResult(EStatut.NOT_FOUND)
@@ -113,7 +113,7 @@ fun generateHtml(word: Word): String {
         sb.append("<p>Origin: ${word.origin}</p>")
 
     word.phonetics
-        .associateBy { ("" + it.text + it.audio) }.values
+        .associateBy { "${it.text}${it.audio}" }.values
         .filter { it.text != null }.nullIfEmpty()?.let { phonetics ->
         sb.append("<h2>Phonetics</h2>")
 

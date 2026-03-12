@@ -164,14 +164,11 @@ fun findUsages(
 
     // Remove duplicate references
     val r = targets
-        .groupBy { it.first.containingFile to it.first.startOffset }
-        .map { it.value.first() }
-        .toSet()
+        .distinctBy { it.first.containingFile to it.first.startOffset }
 
     // Remove duplicate targets
     return r
-        .groupBy { it.first.containingFile to it.second }
-        .map { it.value.first() }
+        .distinctBy { it.first.containingFile to it.second }
         .toSet()
 }
 
