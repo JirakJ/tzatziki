@@ -67,7 +67,7 @@ open class BaiduTranslate : IEngine {
             if (translationResponse.from == null || translationResponse.trans_result == null)
                 throw TranslationException("Response is empty !")
 
-            val translatedText = translationResponse.trans_result.map { it.dst }.joinToString("\n")
+            val translatedText = translationResponse.trans_result.joinToString("\n") { it.dst }
 
             val detectecLanguage = translationResponse.from
 

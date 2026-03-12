@@ -72,13 +72,13 @@ class TzColorSettingsPage : ColorSettingsPage {
                """.trimIndent()
 
     override fun getAttributeDescriptors()
-        = listOf(AttributesDescriptor("Test passed", TEST_OK),
+        = arrayOf(AttributesDescriptor("Test passed", TEST_OK),
                 AttributesDescriptor("Test defect", TEST_KO),
                 AttributesDescriptor("Test ignored", TEST_IGNORED),
                 AttributesDescriptor("Step is deprecated", DEPRECATED),
                 AttributesDescriptor("Breakpoint's step", BREAKPOINT_STEP),
                 AttributesDescriptor("Breakpoint's example", BREAKPOINT_EXAMPLE)
-        ).toTypedArray()
+        )
 
     override fun getAdditionalHighlightingTagToDescriptorMap()
         = mapOf("OK" to TEST_OK,

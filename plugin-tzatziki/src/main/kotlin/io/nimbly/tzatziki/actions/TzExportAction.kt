@@ -78,8 +78,9 @@ class TzExportAction : AnAction() {
 
             // Check selected files all bellong to same root
             var root: VirtualFile? = null
+            val fileIndex = ProjectFileIndex.getInstance(project)
             vfiles?.find {
-                val r = ProjectFileIndex.getInstance(project).getSourceRootForFile(it)
+                val r = fileIndex.getSourceRootForFile(it)
                 if (r == null || root!=null && r!=root) {
                     isVisible = false
                     true

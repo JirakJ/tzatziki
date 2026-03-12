@@ -59,7 +59,7 @@ fun Editor.smartCopy(): Boolean {
 private fun GherkinTable.getTransferable(dataFlavor: DataFlavor, starts: IntArray, ends: IntArray): String {
 
     val raw = dataFlavor == RawText.getDataFlavor()
-    val sb = StringBuilder()
+    val sb = StringBuilder(128)
 
     for (i in starts.indices) {
 

@@ -367,7 +367,7 @@ class TranslationPlusOptionsConfigurable : SearchableConfigurable, Configurable.
 
     override fun apply() {
         mySettings.activeEngine = this.checkBoxes.first { it.second.isSelected }.first.type
-        mySettings.keys = this.keys.map { it.first.type to it.second.text.trim() }.toMap()
+        mySettings.keys = this.keys.associate { it.first.type to it.second.text.trim() }
 
         TranslationManager.changeEngine(mySettings.activeEngine)
     }

@@ -36,7 +36,7 @@ fun initFreeMarker(
         templateExceptionHandler = TemplateExceptionHandler.RETHROW_HANDLER
         logTemplateExceptions = false
 
-        val toMap: Map<KClass<*>, KotlinWrapper<Any>> = wrapper.map { it.kclass to it as KotlinWrapper<Any> }.toMap()
+        val toMap: Map<KClass<*>, KotlinWrapper<Any>> = wrapper.associate { it.kclass to it as KotlinWrapper<Any> }
         objectWrapper = SmartKotlinWrapper(version, toMap, true).apply {
             isAPIBuiltinEnabled = true
         }

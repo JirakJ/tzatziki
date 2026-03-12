@@ -172,8 +172,7 @@ object TzTestRegistry {
 
     fun hasResults(file: PsiFile): Boolean {
         return activeResults.tests
-            .filter { file != it.value.scenario?.containingFile }
-            .isNotEmpty()
+            .any { file != it.value.scenario?.containingFile }
     }
 }
 
@@ -210,8 +209,7 @@ class TzTestResult {
 
     fun clone(): TzTestResult {
         val tests = this.tests
-            .map { it.key to TzTestItem(it.key, it.value.scenario, it.value.tests.toMutableSet()) }
-            .toMap()
+            .mapValues { (key, value) -> TzTestItem(key, value.scenario, value.tests.toMutableSet()) }
         val r = TzTestResult()
         r.tests.putAll(tests)
         return r
