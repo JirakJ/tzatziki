@@ -66,7 +66,7 @@ class PdfSummary(private val depth: ESummaryDepth) {
             if (level != 0)
                 out.append(li(entry, entryIndent, level))
 
-            if (entry.child.size > 0) {
+            if (entry.child.isNotEmpty()) {
                 out.append(ul(entryIndent))
                 entry.child.forEach {
                     generate(it, level + 1, "$entryIndent    ")

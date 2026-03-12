@@ -145,7 +145,7 @@ class TranslationPlusOptionsConfigurable : SearchableConfigurable, Configurable.
                 val engine = checkBoxes.firstOrNull { it.second.isSelected }?.first ?: return
                 var lang = (testAction!!.getValue(SMALL_ICON) as ZIcon).locale
                 if (engine.languages().get(lang) == null) {
-                    lang = engine.languagesToIso639().filter { it.value == "fr" }.firstOrNull()?.key ?: engine.languages().first().key
+                    lang = engine.languagesToIso639().entries.firstOrNull { it.value == "fr" }?.key ?: engine.languages().first().key
                 }
 
                 testLabel.foreground = foreground
@@ -360,7 +360,7 @@ class TranslationPlusOptionsConfigurable : SearchableConfigurable, Configurable.
 
     private fun syncCheckboxes(check: JBCheckBox) {
         if (check.isSelected)
-            checkBoxes.filter { it.second != check }.forEach { it.second.isSelected = false }
+            checkBoxes.forEach { if (it.second != check) it.second.isSelected = false }
         else
             checkBoxes.first().second.isSelected = true
     }

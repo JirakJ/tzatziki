@@ -118,11 +118,13 @@ fun generateHtml(word: Word): String {
         sb.append("<h2>Phonetics</h2>")
 
         var hasSound = false
-        phonetics.filter { it.audio?.endsWith("mp3") == true }.forEach { p ->
-            hasSound = true
-            sb.append("<p><a href=\"${p.audio}\">${p.text}</a>&nbsp;\uD83D\uDD09</font>&nbsp;")
-            sb.append("<small>[").append(p.audio!!.substringAfterLast("/")).append("]</small>")
-            sb.append("</p>")
+        phonetics.forEach { p ->
+            if (p.audio?.endsWith("mp3") == true) {
+                hasSound = true
+                sb.append("<p><a href=\"${p.audio}\">${p.text}</a>&nbsp;\uD83D\uDD09</font>&nbsp;")
+                sb.append("<small>[").append(p.audio!!.substringAfterLast("/")).append("]</small>")
+                sb.append("</p>")
+            }
         }
         if (!hasSound) {
             phonetics.forEach { p ->

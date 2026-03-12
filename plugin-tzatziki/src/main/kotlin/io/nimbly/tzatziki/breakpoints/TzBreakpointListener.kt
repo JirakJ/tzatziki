@@ -273,7 +273,7 @@ class TzBreakpointListener : StartupActivity {
                                 }
                             }
                         }
-                        else if (action == EAction.REMOVED && codeBreakpoints.size == 0) {
+                        else if (action == EAction.REMOVED && codeBreakpoints.isEmpty()) {
                             step.deleteBreakpoints()
                         }
                         else {

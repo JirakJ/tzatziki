@@ -116,7 +116,7 @@ open class Java8StepDefinitionCreator : JavaStepDefinitionCreator() {
         const val CUCUMBER_API_JAVA8_EN = "cucumber.api.java8.En"
         private const val FILE_TEMPLATE_CUCUMBER_JAVA_8_STEP_DEFINITION_JAVA = "Cucumber Java 8 Step Definition.java"
         private fun getConstructor(clazz: PsiClass): PsiMethod {
-            if (clazz.constructors.size == 0) {
+            if (clazz.constructors.isEmpty()) {
                 val factory = JVMElementFactories.requireFactory(clazz.language, clazz.project)
                 val constructor = factory.createConstructor(clazz.name!!)
                 return clazz.add(constructor) as PsiMethod

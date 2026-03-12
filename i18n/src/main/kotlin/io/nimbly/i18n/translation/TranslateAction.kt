@@ -253,9 +253,8 @@ open class TranslateAction : DumbAwareAction()  {
                             val editors = FileEditorManager.getInstance(project).getAllEditors(it.first.containingFile.virtualFile)
                             editors
                                 .filterIsInstance<TextEditor>()
-                                .map { it.editor }
-                                .forEach { ed ->
-                                    displayInlays(element, translation, ed, it.second, zoom, true, true)
+                                .forEach { textEditor ->
+                                    displayInlays(element, translation, textEditor.editor, it.second, zoom, true, true)
                                 }
                             }
                     }

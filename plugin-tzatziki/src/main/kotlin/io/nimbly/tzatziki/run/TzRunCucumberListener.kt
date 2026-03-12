@@ -229,8 +229,8 @@ class TzExecutionCucumberListener : StartupActivity {
                                     FileEditorManager.getInstance(project)
                                         .getEditors(vfile)
                                         .filterIsInstance<TextEditor>()
-                                        .map { it.editor }
-                                        .forEach { editor ->
+                                        .forEach { textEditor ->
+                                            val editor = textEditor.editor
 
                                             val markupModel = editor.markupModel as? MarkupModelEx
                                                 ?: return@forEach

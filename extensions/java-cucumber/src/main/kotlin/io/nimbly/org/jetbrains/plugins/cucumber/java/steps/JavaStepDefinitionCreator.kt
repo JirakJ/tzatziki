@@ -91,7 +91,7 @@ open class JavaStepDefinitionCreator : AbstractStepDefinitionCreator() {
                 builder.replaceElement(nameIdentifier, nameIdentifier.text)
             }
         }
-        if (body!!.statements.size > 0) {
+        if (body!!.statements.isNotEmpty()) {
             val firstStatement: PsiElement = body.statements[0]
             val pendingRange = TextRange(0, firstStatement.textLength - 1)
             builder.replaceElement(
@@ -164,7 +164,7 @@ open class JavaStepDefinitionCreator : AbstractStepDefinitionCreator() {
                                 }
                             }
                         } else {
-                            if (sourceRoots.size > 0) {
+                            if (sourceRoots.isNotEmpty()) {
                                 sourceRoot = sourceRoots[sourceRoots.size - 1]
                             }
                         }

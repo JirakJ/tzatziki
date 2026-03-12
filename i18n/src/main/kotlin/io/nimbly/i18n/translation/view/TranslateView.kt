@@ -100,7 +100,7 @@ class TranslateView : SimpleToolWindowPanel(true, false), TranslationListener {
         fun refresh(usages: Set<PsiElement>? = null, origin: PsiElement? = null) {
 
             if (usages != null) {
-                count = usages.count()
+                count = usages.size
                 fileCount = usages.distinctBy { it.containingFile }.size
 
                 val f = usages.distinctBy { it.containingFile }.singleOrNull()?.containingFile

@@ -66,7 +66,7 @@ class TzCellCompletion: CompletionContributor() {
         // Create a new cell to chain completion
         var suffix = ""
         var cursorOffset = 0
-        if (cell.row.table.dataRows.isEmpty() && cell.row.psiCells.indexOf(cell) == cell.row.psiCells.count()-1) {
+        if (cell.row.table.dataRows.isEmpty() && cell.row.psiCells.indexOf(cell) == cell.row.psiCells.lastIndex) {
             suffix = " | "
             cursorOffset = 0
             if (cell.nextSibling == null  ) {

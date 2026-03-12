@@ -121,7 +121,7 @@ class TzGherkinKotlinExtension : TzGherkinJavaExtension() {
             val added = application.runWriteAction<KtNamedFunction> {
 
                 val importList = ktFile.importList
-                if (importList != null && !importList.imports.map { it.importPath }.contains(importDirective.importPath))
+                if (importList != null && !importList.imports.any { it.importPath == importDirective.importPath })
                     importList.add(importDirective)
 
                 val added = ktClassBody.addBefore(exp, ktClassBody.rBrace)
@@ -166,7 +166,7 @@ class TzGherkinKotlinExtension : TzGherkinJavaExtension() {
                                     }
                                 }
                             } else {
-                                if (sourceRoots.size > 0) {
+                                if (sourceRoots.isNotEmpty()) {
                                     sourceRoot = sourceRoots[sourceRoots.size - 1]
                                 }
                             }

@@ -76,12 +76,11 @@ class TzTestStatusListener : TestStatusListener() {
             if (step !is GherkinStep)
                 return results
 
-            step.paramsSubstitutions
-                .mapNotNull { row.table.findColumnByName(it) }
-                .map { row.cell(it) }
-                .forEach { cell ->
-                    results[cell] = test
-                }
+            step.paramsSubstitutions.forEach { param ->
+                val column = row.table.findColumnByName(param) ?: return@forEach
+                val cell = row.cell(column)
+                results[cell] = test
+            }
         }
 
         return results
