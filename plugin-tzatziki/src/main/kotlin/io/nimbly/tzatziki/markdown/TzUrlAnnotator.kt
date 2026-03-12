@@ -47,7 +47,6 @@ class TzUrlAnnotator : Annotator {
         val text = element.text
         listOf(REGX_IMG_HTML, REGX_URL_MAKD).forEach { reg ->
             reg.findAll(text)
-                .toList()
                 .mapNotNull { it.groups.last() }
                 .filter { !it.range.isEmpty()}
                 .forEach { group ->

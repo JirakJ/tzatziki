@@ -30,6 +30,9 @@ import io.nimbly.tzatziki.util.getDirectory
 import io.nimbly.tzatziki.util.safeText
 import org.jetbrains.plugins.cucumber.psi.GherkinTokenTypes
 
+private val IMAGE_MD_REGEX = Regex("!\\[(.*?)]\\((.*?)\\)")
+private val IMAGE_HTML_REGEX = Regex("<img +src *= *['\"]([a-z0-9-_:./]*)['\"]", RegexOption.IGNORE_CASE)
+
 class TzPictureCompletion: CompletionContributor() {
 
     fun complete(parameters: CompletionParameters, context: ProcessingContext, resultSet: CompletionResultSet) {
@@ -52,7 +55,6 @@ class TzPictureCompletion: CompletionContributor() {
         // Check inside an image description
         fun Regex.find(): String? {
             findAll(element.safeText)
-                .toList()
                 .mapNotNull { it.groups.last() }
                 .forEach {
                     val r = it.range
@@ -62,8 +64,8 @@ class TzPictureCompletion: CompletionContributor() {
             return null
         }
 
-        val imageMd = Regex("!\\[(.*?)]\\((.*?)\\)").find()
-        val imageHTml = Regex("<img +src *= *['\"]([a-z0-9-_:./]*)['\"]", RegexOption.IGNORE_CASE).find()
+        val imageMd = IMAGE_MD_REGEX.find()
+        val imageHTml = IMAGE_HTML_REGEX.find()
 
         if (imageMd == null && imageHTml == null)
             return

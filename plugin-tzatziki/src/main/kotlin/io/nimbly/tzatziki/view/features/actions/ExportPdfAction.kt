@@ -35,7 +35,7 @@ class ExportPdfAction(val panel: FeaturePanel) : AnAction() {
     override fun actionPerformed(event: AnActionEvent) {
 
         val project = panel.project
-        val vfiles = mutableListOf<VirtualFile>()
+        val vfiles = linkedSetOf<VirtualFile>()
 
         val paths = panel.tree.selectionPaths
         paths?.forEach {  treePath ->
@@ -45,18 +45,12 @@ class ExportPdfAction(val panel: FeaturePanel) : AnAction() {
             } else if (userObject is ModuleNode) {
                 val module: Module = userObject.value
                 findAllGerkinsFiles(module, true)
-                    .map { it.virtualFile }
-                    .forEach {
-                        if (!vfiles.contains(it)) vfiles.add(it)
-                    }
+                    .mapTo(vfiles) { it.virtualFile }
             } else if (userObject is GherkinTagNode) {
                 userObject.children
                     .map { it.value }
                     .filterIsInstance<GherkinFile>()
-                    .map { it.virtualFile }
-                    .forEach {
-                        if (!vfiles.contains(it)) vfiles.add(it)
-                    }
+                    .mapTo(vfiles) { it.virtualFile }
             } else {
                 println("Not supported yet")
             }
@@ -74,7 +68,7 @@ class ExportPdfAction(val panel: FeaturePanel) : AnAction() {
         }
 
         try {
-            ExportPdf(vfiles, project).exportFeatures()
+            ExportPdf(vfiles.toList(), project).exportFeatures()
         } catch (e: IndexNotReadyException) {
             DumbService.getInstance(project).showDumbModeNotification("Please wait until index is ready")
         } catch (e: TzatzikiException) {

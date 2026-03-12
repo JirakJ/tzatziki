@@ -168,7 +168,6 @@ fun findStep(
     val start = document.getLineStartOffset(line)
     val end = document.getLineEndOffset(line)
 
-    document.getText(TextRange(start, end))
     return file.findElementsOfTypeInRange(TextRange(start, end), GherkinStep::class.java).firstOrNull()
 }
 
@@ -208,7 +207,7 @@ fun findUsages(elt: PsiElement): List<PsiReference> {
 }
 
 fun GherkinScenarioOutline.allExamples(): List<GherkinTableRow>
-    = this.examplesBlocks.map { it.table.dataRows }.flatten()
+    = this.examplesBlocks.flatMap { it.table.dataRows }
 
 fun GherkinScenarioOutline.getExample(exampleLine: Int?): GherkinTableRow? {
     if (exampleLine == null)

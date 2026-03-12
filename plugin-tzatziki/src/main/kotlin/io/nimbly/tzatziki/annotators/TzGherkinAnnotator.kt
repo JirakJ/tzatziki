@@ -99,18 +99,10 @@ class TzGherkinAnnotatorVisitor(private val myHolder: AnnotationHolder) : Gherki
         val realSubstitutions = getRealSubstitutions(step)
         if (realSubstitutions != null && realSubstitutions.isNotEmpty()) {
             // regexp for searching outline parameters substitutions
-            val regexp = StringBuilder()
-            regexp.append("<(")
-            for (substitution in realSubstitutions) {
-                if (regexp.length > 2) {
-                    regexp.append("|")
-                }
-                regexp.append(Pattern.quote(substitution))
-            }
-            regexp.append(")>")
+            val regexp = "<(${realSubstitutions.joinToString("|") { Pattern.quote(it) }})>"
 
             // for each substitution - add highlighting
-            val pattern = Pattern.compile(regexp.toString())
+            val pattern = Pattern.compile(regexp)
 
             // highlight in step name
             val textStartOffset = reference.rangeInElement.startOffset
@@ -186,19 +178,12 @@ class TzGherkinAnnotatorVisitor(private val myHolder: AnnotationHolder) : Gherki
             val header = table.headerRow!!
             val headerCells = header.psiCells
 
-            // fetch headers
-            val headers: MutableList<String> = ArrayList(headerCells.size + 1)
-            for (headerCell in headerCells) {
-                headers.add(headerCell.text.trim { it <= ' ' })
-            }
+            // fetch headers as Set for O(1) lookup
+            val headers: Set<String> = headerCells.mapTo(HashSet(headerCells.size + 1)) { it.text.trim() }
+
             // filter used substitutions names
-            val realSubstitutions: MutableList<String> = ArrayList(possibleSubstitutions.size + 1)
-            for (substitution in possibleSubstitutions) {
-                if (headers.contains(substitution)) {
-                    realSubstitutions.add(substitution)
-                }
-            }
-            return if (realSubstitutions.isEmpty()) null else realSubstitutions
+            val realSubstitutions = possibleSubstitutions.filter { it in headers }
+            return realSubstitutions.ifEmpty { null }
         }
     }
 }

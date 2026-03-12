@@ -128,7 +128,8 @@ class TzBreakpointListener : StartupActivity {
                     else if (action == EAction.REMOVED) {
 
                         // Remove step's breakpoint if no more row breakpoint exists
-                        val hasStillRowBreakpoint = scenario.allExamples().find { it.findBreakpoint() != null } != null
+                        val allExamples = scenario.allExamples()
+                        val hasStillRowBreakpoint = allExamples.find { it.findBreakpoint() != null } != null
                         if (!hasStillRowBreakpoint) {
                             scenario.steps.forEach { it.deleteBreakpoints() }
                         }
@@ -137,8 +138,9 @@ class TzBreakpointListener : StartupActivity {
 
                         // Sync row breakpoint if all step's breakpoint has same state
                         val state = gherkinBreakpoint.isEnabled
+                        val allExamples = scenario.allExamples()
                         if (gherkinBreakpoint.isEnabled ||
-                            scenario.allExamples().filter { it != row }.find { exampleRow ->
+                            allExamples.filter { it != row }.find { exampleRow ->
                                 val bp = exampleRow.findBreakpoint()
                                 bp != null && bp.isEnabled != gherkinBreakpoint.isEnabled
                             } == null) {
@@ -223,6 +225,7 @@ class TzBreakpointListener : StartupActivity {
                         val state = gherkinBreakpoint.isEnabled
                         val scenario = step.parentOfTypeIs<GherkinScenarioOutline>(true)
                         if (scenario != null) {
+                            val allExamples = scenario.allExamples()
 
                             if (gherkinBreakpoint.isEnabled ||
                                 scenario.steps.filter { it != step }.find { s ->
@@ -230,7 +233,7 @@ class TzBreakpointListener : StartupActivity {
                                     bp != null && bp.isEnabled != gherkinBreakpoint.isEnabled
                                 } == null) {
 
-                                scenario.allExamples().forEach {
+                                allExamples.forEach {
                                     it.enableBreakpoints(state)
                                 }
                             }
