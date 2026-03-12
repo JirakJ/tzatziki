@@ -65,11 +65,12 @@ class Context {
         override fun mouseMoved(e: EditorMouseEvent) {
 
             val focusInlays = findTranslationInlays(e, true)
+            val firstInlay = focusInlays.firstOrNull()
             val maxLength = focusInlays.maxOfOrNull { it.renderer.translation.length }
 
-            if (focusInlays.isNotEmpty()
-                && focusInlays.first().visualPosition.column < e.visualPosition.column
-                && focusInlays.first().visualPosition.column + maxLength!! + 2 > e.visualPosition.column) {
+            if (firstInlay != null && maxLength != null
+                && firstInlay.visualPosition.column < e.visualPosition.column
+                && firstInlay.visualPosition.column + maxLength + 2 > e.visualPosition.column) {
                 val customCursor = Cursor(Cursor.HAND_CURSOR)
                 e.editor.contentComponent.cursor = customCursor
             }

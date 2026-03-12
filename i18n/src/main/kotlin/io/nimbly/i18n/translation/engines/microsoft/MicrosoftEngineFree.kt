@@ -51,8 +51,9 @@ open class MicrosoftEngineFree : IEngine {
         if (response.isSuccessful && responseBody != null) {
 
             val translationResponse = Gson().fromJson(responseBody, Array<JsonData>::class.java)
-            val translatedText = translationResponse.first().translations.first().text
-            val detectedSourceLanguage = translationResponse.first().detectedLanguage.language.lowercase()
+            val firstResult = translationResponse.first()
+            val translatedText = firstResult.translations.first().text
+            val detectedSourceLanguage = firstResult.detectedLanguage.language.lowercase()
 
             return Translation(translatedText, detectedSourceLanguage)
 

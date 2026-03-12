@@ -21,7 +21,7 @@ private const val TAG = "@tablesOfContentTag#"
 
 class PdfBuilder(private val style: PdfStyle) {
 
-    private var out = StringBuilder()
+    private var out = StringBuilder(8192)
     private var isSummaryInserted = false
     private val summary = PdfSummary(style.summaryDepth)
 
@@ -74,7 +74,7 @@ class PdfBuilder(private val style: PdfStyle) {
 
     fun generate(): String {
 
-        val sb = StringBuilder()
+        val sb = StringBuilder(4096)
         fun tag(tag: String, function: () -> Unit) {
             sb.append("\n<$tag>")
             function()

@@ -171,16 +171,16 @@ class TranslateView : SimpleToolWindowPanel(true, false), TranslationListener {
 
         setContent(initPanel())
 
-        EditorFactory.getInstance()
-            .eventMulticaster
+        val multicaster = EditorFactory.getInstance().eventMulticaster
+
+        multicaster
             .addCaretListener(object : CaretListener {
                 override fun caretPositionChanged(event: CaretEvent) {
                     refresh(event.editor)
                 }
             }, ApplicationManager.getApplication())
 
-        EditorFactory.getInstance()
-            .eventMulticaster
+        multicaster
             .addSelectionListener(object : SelectionListener {
                 override fun selectionChanged(event: SelectionEvent) {
                     refresh(event.editor)

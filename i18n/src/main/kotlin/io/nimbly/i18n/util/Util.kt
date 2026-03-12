@@ -92,14 +92,14 @@ fun String.trimIndentLenght(): Int {
 
 fun String.indentAs(model: String): String {
 
-    val modelLines = model.split("\n")
+    val modelLines = model.split('\n')
     val indents = modelLines
         .map { it.length - it.trimStart().length }
 
     val firstNonBlank = modelLines.indexOfFirst { it.isNotBlank() }
     val lastNonBlank = modelLines.indexOfLast { it.isNotBlank() }
 
-    val lines = this.split("\n")
+    val lines = this.split('\n')
 
     val indented = modelLines
         .mapIndexed { index, ml ->

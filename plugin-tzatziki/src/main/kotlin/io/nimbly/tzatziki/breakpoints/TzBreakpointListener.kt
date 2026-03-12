@@ -28,7 +28,7 @@ class TzBreakpointListener : StartupActivity {
         var removeInProgress = false
 
         project.messageBus
-            .connect()
+            .connect(project)
             .subscribe(XBreakpointListener.TOPIC, object : XBreakpointListener<XBreakpoint<*>> {
 
                 override fun breakpointChanged(breakpoint: XBreakpoint<*>) {

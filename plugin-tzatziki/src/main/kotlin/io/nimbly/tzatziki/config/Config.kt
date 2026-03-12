@@ -337,7 +337,7 @@ fun createConfiguration(
         propertiesFiles.forEach {
             val v = it.getProperty(property, null)
             if (v != null)
-                return "True".toUpperCase() == v.trim()
+                return v.trim().equals("true", ignoreCase = true)
         }
         return false
     }
@@ -346,8 +346,7 @@ fun createConfiguration(
         propertiesFiles
             .flatMap { it.stringPropertyNames() }
             .filter { it.startsWith("export.frontpage.") }
-            .map { it.substring(17) to get(it) }
-            .toMap()
+            .associate { it.substring(17) to get(it) }
 
     return Config(
         font = font,
@@ -364,7 +363,7 @@ fun createConfiguration(
         summaryDepth = ESummaryDepth.valueOf(get("export.summary.depth")),
         summaryLeader = ELeader.valueOf(get("export.summary.leader")),
         summaryFontSize = get("export.summary.fontSize"),
-        summaryListStyles = get("export.summary.listStyles").split(",").map { it.trim() },
+        summaryListStyles = get("export.summary.listStyles").split(',').map { it.trim() },
         css = css,
         picture = Picture("Tzatziki", picture, "svg"),
         template = template,

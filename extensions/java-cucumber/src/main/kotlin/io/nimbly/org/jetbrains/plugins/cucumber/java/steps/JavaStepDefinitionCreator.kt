@@ -162,7 +162,7 @@ open class JavaStepDefinitionCreator : AbstractStepDefinitionCreator() {
                             }
                         } else {
                             if (sourceRoots.isNotEmpty()) {
-                                sourceRoot = sourceRoots[sourceRoots.size - 1]
+                                sourceRoot = sourceRoots.last()
                             }
                         }
                     }
@@ -270,7 +270,7 @@ open class JavaStepDefinitionCreator : AbstractStepDefinitionCreator() {
                 val result = generator.generateExpressions(step)[0]
                 if (result != null) {
                     val cucumberExpression = JavaSnippet().escapePattern(result.source)
-                    val lines = snippet.split("\n").dropLastWhile { it.isEmpty() }
+                    val lines = snippet.split('\n').dropLastWhile { it.isEmpty() }
                         .toTypedArray()
                     val start = lines[0].indexOf('(') + 1
                     lines[0] = lines[0].substring(0, start + 1) + cucumberExpression + "\")"

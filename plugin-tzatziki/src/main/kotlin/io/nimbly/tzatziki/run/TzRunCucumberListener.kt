@@ -125,7 +125,7 @@ class TzExecutionCucumberListener : StartupActivity {
     override fun runActivity(project: Project) {
 
         project.messageBus
-            .connect()
+            .connect(project)
             .subscribe(ExecutionManager.EXECUTION_TOPIC, object : ExecutionListener {
 
                 private var stopRequested = false

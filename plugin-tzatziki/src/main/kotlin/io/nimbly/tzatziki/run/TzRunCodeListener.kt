@@ -31,7 +31,7 @@ class TzRunCodeListener : StartupActivity {
     override fun runActivity(project: Project) {
 
         project.messageBus
-            .connect()
+            .connect(project)
             .subscribe(XDebuggerManager.TOPIC, object : XDebuggerManagerListener {
 
                 override fun processStarted(debugProcess: XDebugProcess) {

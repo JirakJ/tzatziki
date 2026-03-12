@@ -214,7 +214,8 @@ class CucumberPlusFilterTagsView(val project: Project) : SimpleToolWindowPanel(t
             }
 
             try {
-                val expression = if (tSelection.text.trim().isEmpty()) null else TagExpressionParser.parse(tSelection.text.trim())
+                val trimmedText = tSelection.text.trim()
+                val expression = if (trimmedText.isEmpty()) null else TagExpressionParser.parse(trimmedText)
                 tzService.updateTagsFilter(expression)
             } catch (ignored: Exception) {
             }

@@ -128,7 +128,7 @@ fun String.postTranslation(format: EFormat): String {
 private fun String.postTranslationCSV(): String {
     try {
         val sb = StringBuilder()
-        this.split("\n").forEach { line ->
+        this.split('\n').forEach { line ->
             val split = line.split("[#]")
             split.forEachIndexed { i, col ->
                 sb.append(StringEscapeUtils.escapeCsv(col.trim()))

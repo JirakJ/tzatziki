@@ -208,9 +208,9 @@ fun loadCells(table: GherkinTable): List<List<String>> {
 
 private fun loadCells(text: String): List<List<String>> {
     val lines = mutableListOf<List<String>>()
-    text.split("\n").forEach { line ->
+    text.split('\n').forEach { line ->
         lines.add(
-            line.split("\t")
+            line.split('\t')
                 .map { it.trim() })
     }
     return lines

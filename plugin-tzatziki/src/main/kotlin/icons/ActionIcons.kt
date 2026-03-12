@@ -24,6 +24,8 @@ import javax.swing.Icon
 // New UI icons svg : https://www.jetbrains.com/intellij-repository/releases
 object ActionIcons {
 
+    private val iconManager = IconManager.getInstance()
+
     @JvmField val SHIFT_LEFT = IconLoader.getIcon("/io/nimbly/tzatziki/icons/column-shift-left-16x16.png", javaClass)
     @JvmField val SHIFT_RIGHT = IconLoader.getIcon("/io/nimbly/tzatziki/icons/column-shift-right-16x16.png", javaClass)
     @JvmField val SHIFT_UP = IconLoader.getIcon("/io/nimbly/tzatziki/icons/line-16x16-shift-up.png", javaClass)
@@ -34,22 +36,22 @@ object ActionIcons {
     @JvmField val DELETE_LINE = IconLoader.getIcon("/io/nimbly/tzatziki/icons/line-delete-16x16.png", javaClass)
     @JvmField val DELETE_COLUMN = IconLoader.getIcon("/io/nimbly/tzatziki/icons/culumn-delete-16x16.png", javaClass)
 
-    @JvmField val CUCUMBER_PLUS_64 = IconManager.getInstance().getIcon("/io/nimbly/tzatziki/icons/cucumber-plus.png", javaClass)
-    @JvmField val CUCUMBER_PLUS_16 = IconManager.getInstance().getIcon("/io/nimbly/tzatziki/icons/cucumber-plus-16x16.png", javaClass)
-    @JvmField val CUCUMBER_PLUS = IconManager.getInstance().getIcon("/io/nimbly/tzatziki/icons/cucumber-plus.png", javaClass)
+    @JvmField val CUCUMBER_PLUS_64 = iconManager.getIcon("/io/nimbly/tzatziki/icons/cucumber-plus.png", javaClass)
+    @JvmField val CUCUMBER_PLUS_16 = iconManager.getIcon("/io/nimbly/tzatziki/icons/cucumber-plus-16x16.png", javaClass)
+    @JvmField val CUCUMBER_PLUS = iconManager.getIcon("/io/nimbly/tzatziki/icons/cucumber-plus.png", javaClass)
 
-    @JvmField val RUN = IconManager.getInstance().getIcon("/io/nimbly/tzatziki/icons/run.svg", javaClass)
+    @JvmField val RUN = iconManager.getIcon("/io/nimbly/tzatziki/icons/run.svg", javaClass)
 
-    @JvmField val STEP = IconManager.getInstance().getIcon("/io/nimbly/tzatziki/icons/step.svg", javaClass)
+    @JvmField val STEP = iconManager.getIcon("/io/nimbly/tzatziki/icons/step.svg", javaClass)
 
-    @JvmField val FILTER = IconManager.getInstance().getIcon("/io/nimbly/tzatziki/icons/filter.svg", javaClass)
+    @JvmField val FILTER = iconManager.getIcon("/io/nimbly/tzatziki/icons/filter.svg", javaClass)
 
-    @JvmField val TAG = IconManager.getInstance().getIcon("/io/nimbly/tzatziki/icons/tag.svg", javaClass)
-    @JvmField val TAG_GRAY = IconManager.getInstance().getIcon("/io/nimbly/tzatziki/icons/tagGray.svg", javaClass)
+    @JvmField val TAG = iconManager.getIcon("/io/nimbly/tzatziki/icons/tag.svg", javaClass)
+    @JvmField val TAG_GRAY = iconManager.getIcon("/io/nimbly/tzatziki/icons/tagGray.svg", javaClass)
 
-    @JvmField val PDF = IconManager.getInstance().getIcon("/io/nimbly/tzatziki/icons/pdf.svg", javaClass)
+    @JvmField val PDF = iconManager.getIcon("/io/nimbly/tzatziki/icons/pdf.svg", javaClass)
 
-    @JvmField val GROUP_BY_MODULE = IconManager.getInstance().getIcon("/io/nimbly/tzatziki/icons/groupByModule.svg", javaClass)
+    @JvmField val GROUP_BY_MODULE = iconManager.getIcon("/io/nimbly/tzatziki/icons/groupByModule.svg", javaClass)
 
-    val ImagesFileType = IconManager.getInstance().getIcon("/org/intellij/images/icons/ImagesFileType.svg", javaClass)
+    val ImagesFileType = iconManager.getIcon("/org/intellij/images/icons/ImagesFileType.svg", javaClass)
 }

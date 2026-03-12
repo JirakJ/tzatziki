@@ -100,14 +100,15 @@ open class DictionaryAction : AnAction() , DumbAware {
         if (text == null)
             return
 
-        EditorFactory.getInstance().clearInlays(editor.project)
+        val editorFactory = EditorFactory.getInstance()
+        editorFactory.clearInlays(editor.project)
 
         //
         // Search definition
         //
         val def = DictionaryManager.searchDefinition(text, camelCase = camelCase)
 
-        EditorFactory.getInstance().clearInlays(editor.project)
+        editorFactory.clearInlays(editor.project)
 
         val translationLines =
             if (def.status == EStatut.NOT_FOUND) {
