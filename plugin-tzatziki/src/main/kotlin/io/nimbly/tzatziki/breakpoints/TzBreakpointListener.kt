@@ -111,7 +111,7 @@ class TzBreakpointListener : StartupActivity {
                     if (action == EAction.ADDED) {
 
                         // Check if at least one breakpoint is set
-                        if (scenario.steps.find { it.findBreakpoint() != null } != null)
+                        if (scenario.steps.any { it.findBreakpoint() != null })
                             return
 
                         // Add step breakpoints
@@ -129,7 +129,7 @@ class TzBreakpointListener : StartupActivity {
 
                         // Remove step's breakpoint if no more row breakpoint exists
                         val allExamples = scenario.allExamples()
-                        val hasStillRowBreakpoint = allExamples.find { it.findBreakpoint() != null } != null
+                        val hasStillRowBreakpoint = allExamples.any { it.findBreakpoint() != null }
                         if (!hasStillRowBreakpoint) {
                             scenario.steps.forEach { it.deleteBreakpoints() }
                         }
@@ -140,10 +140,10 @@ class TzBreakpointListener : StartupActivity {
                         val state = gherkinBreakpoint.isEnabled
                         val allExamples = scenario.allExamples()
                         if (gherkinBreakpoint.isEnabled ||
-                            allExamples.filter { it != row }.find { exampleRow ->
+                            !allExamples.filter { it != row }.any { exampleRow ->
                                 val bp = exampleRow.findBreakpoint()
                                 bp != null && bp.isEnabled != gherkinBreakpoint.isEnabled
-                            } == null) {
+                            }) {
 
                             scenario.steps.forEach {
                                 it.enableBreakpoints(state)
@@ -181,7 +181,7 @@ class TzBreakpointListener : StartupActivity {
                         val scenario = step.parentOfTypeIs<GherkinScenarioOutline>(true)
                         if (scenario != null) {
                             val examples = scenario.allExamples()
-                            val hasBreakpoints = examples.find { it.findBreakpoint() != null } != null
+                            val hasBreakpoints = examples.any { it.findBreakpoint() != null }
                             if (!hasBreakpoints) {
                                 examples.forEach {
 
@@ -206,7 +206,7 @@ class TzBreakpointListener : StartupActivity {
                         }
 
                         // Remove row breakspoints
-                        val scenarioStillHasBreakpoints = step.stepHolder.steps.find { it.findBreakpoint() != null } != null
+                        val scenarioStillHasBreakpoints = step.stepHolder.steps.any { it.findBreakpoint() != null }
                         if (step.stepHolder is GherkinScenarioOutline && !scenarioStillHasBreakpoints) {
 
                             val allExamples = (step.stepHolder as GherkinScenarioOutline).allExamples()
@@ -228,10 +228,10 @@ class TzBreakpointListener : StartupActivity {
                             val allExamples = scenario.allExamples()
 
                             if (gherkinBreakpoint.isEnabled ||
-                                scenario.steps.filter { it != step }.find { s ->
+                                !scenario.steps.filter { it != step }.any { s ->
                                     val bp = s.findBreakpoint()
                                     bp != null && bp.isEnabled != gherkinBreakpoint.isEnabled
-                                } == null) {
+                                }) {
 
                                 allExamples.forEach {
                                     it.enableBreakpoints(state)

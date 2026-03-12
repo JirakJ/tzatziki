@@ -46,7 +46,7 @@ class   TzMarkdownAnnotator : Annotator {
 
         //
         // BOLD
-        val bolds: MutableMap<Int, Int> = HashMap()
+        val bolds: MutableMap<Int, Int> = HashMap(16)
         var matcher = BOLD_PATTERN.matcher(text)
         while (matcher.find()) {
             val from = element.textOffset + matcher.start(1)
@@ -59,7 +59,7 @@ class   TzMarkdownAnnotator : Annotator {
 
         //
         // BULLETS
-        val bullets: MutableList<Int> = ArrayList()
+        val bullets: MutableSet<Int> = HashSet()
         matcher = STAR_START_PATTERN.matcher(text)
         while (matcher.find()) {
             val group = matcher.group(1)

@@ -97,7 +97,7 @@ private class TzatzikiTransferableData(table: GherkinTable, startOffsets: IntArr
         = myTransferDataFlavors.toTypedArray()
 
     override fun isDataFlavorSupported(flavor: DataFlavor)
-        = transferDataFlavors.find { it == flavor } != null
+        = transferDataFlavors.any { it == flavor }
 
     override fun getTransferData(flavor: DataFlavor): Any {
         try {

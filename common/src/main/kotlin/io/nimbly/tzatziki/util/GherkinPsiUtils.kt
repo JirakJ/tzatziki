@@ -87,14 +87,14 @@ fun GherkinFeature.checkExpression(tagExpression: Expression?): Boolean {
         return true
     if (tagExpression.evaluate(this.tags.map { it.name }))
         return true
-    return this.scenarios.find {
-        !it.isBackground && it.checkExpression(tagExpression) } != null
+    return this.scenarios.any {
+        !it.isBackground && it.checkExpression(tagExpression) }
 }
 
 fun GherkinFile.checkExpression(tagExpression: Expression?): Boolean {
     if (tagExpression == null)
         return true
-    return this.features.find { it.checkExpression(tagExpression) } != null
+    return this.features.any { it.checkExpression(tagExpression) }
 }
 
 val GherkinFeature.tags: List<GherkinTag>

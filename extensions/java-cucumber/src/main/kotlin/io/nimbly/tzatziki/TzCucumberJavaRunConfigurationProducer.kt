@@ -31,6 +31,9 @@ import org.jetbrains.plugins.cucumber.java.run.CucumberJavaRunConfiguration
 import org.jetbrains.plugins.cucumber.java.run.CucumberJavaScenarioRunConfigurationProducer
 import org.jetbrains.plugins.cucumber.psi.*
 
+private val FILE_PATH_LINE_REGEX = ".*:[0-9]+$".toRegex()
+private val EXAMPLE_NAME_REGEX = ".*(- Example n°)[0-9]+\$".toRegex()
+
 class TzCucumberJavaRunConfigurationProducer : CucumberJavaScenarioRunConfigurationProducer() {
 
     override fun setupConfigurationFromContext(
@@ -52,7 +55,7 @@ class TzCucumberJavaRunConfigurationProducer : CucumberJavaScenarioRunConfigurat
         super.setupConfigurationFromContext(configuration, context, sourceElement)
 
         val filePath = configuration.filePath ?: return false
-        if (filePath.matches(".*:[0-9]+$".toRegex()))
+        if (filePath.matches(FILE_PATH_LINE_REGEX))
             return true
 
         configuration.filePath = filePath + ":" + line;
@@ -90,7 +93,7 @@ class TzCucumberJavaRunConfigurationProducer : CucumberJavaScenarioRunConfigurat
 
     override fun getConfigurationName(context: ConfigurationContext): String {
         val name = super.getConfigurationName(context)
-        if (name.matches(".*(- Example n°)[0-9]+\$".toRegex()))
+        if (name.matches(EXAMPLE_NAME_REGEX))
             return name
 
         val element = context.psiLocation

@@ -69,8 +69,7 @@ object JavaUtil {
 
 fun isJavaPresent(): Boolean {
     return try {
-        val clz: Class<JavaDebugProcess> = JavaDebugProcess::class.java
-        clz.toString()
+        JavaDebugProcess::class.java
         true
     } catch (e: NoClassDefFoundError) {
         false

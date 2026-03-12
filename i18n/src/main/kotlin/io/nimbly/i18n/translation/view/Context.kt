@@ -79,7 +79,7 @@ class Context {
 
             val toReplace = mutableListOf<Inlay<EditorHint>>()
             e.editor.getTranslationInlays().forEach { inlay ->
-                if (focusInlays.find { it.renderer == inlay.renderer } != null) {
+                if (focusInlays.any { it.renderer == inlay.renderer }) {
                     if (inlay.renderer.mouseEnter())
                         toReplace.add(inlay)
                 } else {
