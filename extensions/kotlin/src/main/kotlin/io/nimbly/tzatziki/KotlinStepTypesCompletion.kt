@@ -22,6 +22,8 @@ import org.jetbrains.kotlin.psi.KtStringTemplateEntry
  *  - Custom types
  *  @see <a href="https://github.com/cucumber/cucumber-expressions#readme">cucumber-expressions</a>
  */
+private val STEP_TYPES_REGEX = ".*\\{(\\w|\\s|\\d)*$".toRegex()
+
 class KotlinStepTypesCompletion : TzStepTypesCompletion() {
 
     override fun complete(
@@ -43,7 +45,7 @@ class KotlinStepTypesCompletion : TzStepTypesCompletion() {
         val lineStart = document.getLineStart(parameters.offset)
         val text = document.getText(TextRange(lineStart, parameters.offset))
 
-        if (!text.matches(".*\\{(\\w|\\s|\\d)*$".toRegex()))
+        if (!text.matches(STEP_TYPES_REGEX))
             return
 
         //

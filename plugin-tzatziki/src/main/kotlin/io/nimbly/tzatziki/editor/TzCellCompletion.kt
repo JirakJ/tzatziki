@@ -127,7 +127,7 @@ class TzCellCompletion: CompletionContributor() {
 
         // Group by number of use
         val groupBy: Map<String, Int>
-                = values.groupBy { it }.map { it.key to it.value.size }.toMap()
+                = values.groupingBy { it }.eachCount()
 
         // Add all values to completion
         groupBy.forEach { (value, count) ->

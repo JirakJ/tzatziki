@@ -70,10 +70,8 @@ class TzTestsResultsAnnotator : Annotator {
         val results = TzTestRegistry.results
         row.children
             .filterIsInstance<GherkinTableCell>()
-            .map { it to results[it] }
-            .toMap()
-            .filterValuesNotNull()
-            .forEach { (cell, tests) ->
+            .forEach { cell ->
+                val tests = results[cell] ?: return@forEach
                 doAnnotateCommon(tests, cell, holder)
             }
     }

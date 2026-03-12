@@ -164,17 +164,10 @@ class TzFileService(val project: Project) : Disposable {
     }
 
     private fun findAllGerkinsFiles(scope: GlobalSearchScope, project: Project): Set<GherkinFile> {
-
-        val allFeatures = mutableSetOf<GherkinFile>()
-        FilenameIndex
+        return FilenameIndex
             .getAllFilesByExt(project, GherkinFileType.INSTANCE.defaultExtension, scope)
-            .map { vfile -> vfile.getFile(project) }
-            .filterIsInstance<GherkinFile>()
-            .forEach { file ->
-                allFeatures.add(file)
-            }
-
-        return allFeatures
+            .mapNotNull { vfile -> vfile.getFile(project) as? GherkinFile }
+            .toSet()
     }
 
 }
@@ -322,8 +315,7 @@ private fun findAllTags(project: Project, scope: GlobalSearchScope): SortedMap<S
         .forEach { file ->
             val tags = CachedValuesManager.getCachedValue(file, CacheTagsKey) {
 
-                val tags: List<GherkinTag> = PsiTreeUtil.collectElements(file) { element -> element is GherkinTag }
-                    .map { it as GherkinTag }
+                val tags: List<GherkinTag> = PsiTreeUtil.findChildrenOfType(file, GherkinTag::class.java)
                     .filter { it.name.isNotEmpty() }
 
                 CachedValueProvider.Result.create(
@@ -334,11 +326,7 @@ private fun findAllTags(project: Project, scope: GlobalSearchScope): SortedMap<S
 
             tags.forEach { gtag: GherkinTag ->
                 val name = gtag.name.substringAfter("@")
-                var tag = allTags[name]
-                if (tag == null) {
-                    tag = Tag(gtag)
-                    allTags[name] = tag
-                }
+                val tag = allTags.getOrPut(name) { Tag(gtag) }
                 tag._tags.add(gtag)
                 tag._files.add(gtag.containingFile as GherkinFile)
             }

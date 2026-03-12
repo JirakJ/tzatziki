@@ -18,8 +18,8 @@ import org.jetbrains.plugins.cucumber.psi.GherkinStep
 
 fun GherkinStep.updatePresentation(codeBreakpoints: List<XBreakpoint<*>>) {
 
-    val enabled = codeBreakpoints.map { if (it.isEnabled) 1 else 0 }.sum()
-    val condition = codeBreakpoints.map { it.conditionExpression }.filterNotNull().firstOrNull()
+    val enabled = codeBreakpoints.count { it.isEnabled }
+    val condition = codeBreakpoints.mapNotNull { it.conditionExpression }.firstOrNull()
 
     val stepBreakpoints = XDebuggerManager.getInstance(project).breakpointManager.allBreakpoints
         .filter { it.sourcePosition?.file == containingFile.virtualFile }

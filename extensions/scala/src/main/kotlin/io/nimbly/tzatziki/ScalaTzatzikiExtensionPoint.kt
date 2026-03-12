@@ -79,8 +79,8 @@ class ScalaTzatzikiExtensionPoint : TzatzikiExtensionPoint {
                 val steps = CachedValuesManager.getCachedValue(f, CacheKey) {
 
                     val steps = f.features
-                        .flatMap { feature -> feature.scenarios.toList() }
-                        .flatMap { scenario -> scenario.steps.toList() }
+                        .flatMap { feature -> feature.scenarios.asSequence() }
+                        .flatMap { scenario -> scenario.steps.asSequence() }
 
                     CachedValueProvider.Result.create(
                         steps,

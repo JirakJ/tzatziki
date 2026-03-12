@@ -67,8 +67,8 @@ class TzScenarioCompletion: CompletionContributor() {
                 val steps = CachedValuesManager.getCachedValue(file, CacheKey) {
 
                     val steps = file.features
-                        .flatMap { feature -> feature.scenarios.toList() }
-                        .flatMap { scenario -> scenario.steps.toList() }
+                        .flatMap { feature -> feature.scenarios.asSequence() }
+                        .flatMap { scenario -> scenario.steps.asSequence() }
                         .map { Step(it) }
                         .filter { it.description.isNotEmpty() }
 

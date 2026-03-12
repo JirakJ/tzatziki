@@ -50,8 +50,7 @@ abstract class TzStepsUsagesMarker : LineMarkerProvider {
                     .map { it to step }
             }
             .groupBy { it.first }
-            .map { it.key to it.value.map { it.second }.toList() }
-            .toMap()
+            .mapValues { entry -> entry.value.map { it.second } }
 
         // Find annotation usages
         val steps = groupedByRegex[annotationText]

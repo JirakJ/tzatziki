@@ -149,8 +149,7 @@ class FeaturePanel(val project: Project) : SimpleToolWindowPanel(true), Disposab
     fun refreshTags(tags: SortedMap<String, Tag>) {
         if (structure.groupTag || structure.filterByTags != null) {
             val stags = tags
-                .map { it.key to it.value.gFiles.toList() }
-                .toMap()
+                .mapValues { it.value.gFiles.toList() }
                 .toSortedMap(TagComparator)
             structure.tags = stags
         }

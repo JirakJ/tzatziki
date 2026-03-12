@@ -191,7 +191,7 @@ class TzBreakpointListener : StartupActivity {
                     else if (action == EAction.REMOVED) {
 
                         // Count the number of gherkin breakpoint link to this code breakpoint
-                        val stepBreakpoints = allCodeBreakpoints?.first?.map { it.findBreakpoint() }?.filterNotNull()?.size
+                        val stepBreakpoints = allCodeBreakpoints?.first?.mapNotNull { it.findBreakpoint() }?.size
 
                         // If there is more gherkin breakpoint, then remove the related code breakpoint
                         if (stepBreakpoints == 0) {

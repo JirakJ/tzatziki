@@ -21,6 +21,8 @@ import com.intellij.util.ProcessingContext
  *  - Custom types
  *  @see <a href="https://github.com/cucumber/cucumber-expressions#readme">cucumber-expressions</a>
  */
+private val STEP_TYPES_REGEX = ".*\\{(\\w|\\s|\\d)*$".toRegex()
+
 class JavaStepTypesCompletion : TzStepTypesCompletion() {
 
     override fun complete(parameters: CompletionParameters, context: ProcessingContext, resultSet: CompletionResultSet) {
@@ -39,7 +41,7 @@ class JavaStepTypesCompletion : TzStepTypesCompletion() {
         val lineStart = document.getLineStart(parameters.offset)
         val text = document.getText(TextRange(lineStart, parameters.offset))
 
-        if (!text.matches(".*\\{(\\w|\\s|\\d)*$".toRegex()))
+        if (!text.matches(STEP_TYPES_REGEX))
             return
 
         //

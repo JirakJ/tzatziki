@@ -84,8 +84,9 @@ class TzBreakpointSyncInspection : GherkinInspection() {
                 // Look for code breakpoints
                 val stepDefinitions = reference?.resolveToDefinition()
                 val codeElement = stepDefinitions?.element
+                val extensions = Tzatziki().extensionList
                 val codeBreakpoints =
-                    Tzatziki().extensionList.firstNotNullOfOrNull {
+                    extensions.firstNotNullOfOrNull {
                     it.findStepsAndBreakpoints(
                         codeElement?.containingFile?.virtualFile,
                         codeElement?.textOffset
@@ -102,7 +103,7 @@ class TzBreakpointSyncInspection : GherkinInspection() {
                 if (gherkinBreakpoints != null && codeBreakpoints == null && stepDefinitions != null) {
 
                     // Restore breakpoint since reference is lost !
-                    val elt = Tzatziki().extensionList.firstNotNullOfOrNull {
+                    val elt = extensions.firstNotNullOfOrNull {
                         it.findBestPositionToAddBreakpoint(listOf(stepDefinitions))
                     } ?: return
                     toggleCodeBreakpoint(elt, step.project)
