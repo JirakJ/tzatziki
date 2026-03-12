@@ -52,7 +52,7 @@ class TranslationModuleListener : StartupActivity {
     }
 
     companion object {
-        private var handlerInitialized = false
+        @Volatile private var handlerInitialized = false
     }
 }
 

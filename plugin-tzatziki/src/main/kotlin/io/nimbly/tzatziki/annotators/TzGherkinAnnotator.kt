@@ -30,6 +30,7 @@ import org.jetbrains.plugins.cucumber.CucumberBundle
 import org.jetbrains.plugins.cucumber.psi.*
 import org.jetbrains.plugins.cucumber.psi.impl.GherkinScenarioOutlineImpl
 import org.jetbrains.plugins.cucumber.steps.reference.CucumberStepReference
+import java.util.LinkedHashMap
 import java.util.regex.Pattern
 
 //https://youtrack.jetbrains.com/issue/IDEA-269898
@@ -98,11 +99,7 @@ class TzGherkinAnnotatorVisitor(private val myHolder: AnnotationHolder) : Gherki
     private fun highlightOutlineParams(step: GherkinStep, reference: CucumberStepReference) {
         val realSubstitutions = getRealSubstitutions(step)
         if (realSubstitutions != null && realSubstitutions.isNotEmpty()) {
-            // regexp for searching outline parameters substitutions
-            val regexp = "<(${realSubstitutions.joinToString("|") { Pattern.quote(it) }})>"
-
-            // for each substitution - add highlighting
-            val pattern = Pattern.compile(regexp)
+            val pattern = getOrCreatePattern(realSubstitutions)
 
             // highlight in step name
             val textStartOffset = reference.rangeInElement.startOffset
@@ -149,6 +146,20 @@ class TzGherkinAnnotatorVisitor(private val myHolder: AnnotationHolder) : Gherki
     }
 
     companion object {
+        // LRU cache for compiled outline parameter patterns (avoids recompilation per keystroke)
+        private val patternCache = object : LinkedHashMap<List<String>, Pattern>(16, 0.75f, true) {
+            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<List<String>, Pattern>?) = size > 64
+        }
+
+        private fun getOrCreatePattern(substitutions: List<String>): Pattern {
+            return synchronized(patternCache) {
+                patternCache.getOrPut(substitutions) {
+                    val regexp = "<(${substitutions.joinToString("|") { Pattern.quote(it) }})>"
+                    Pattern.compile(regexp)
+                }
+            }
+        }
+
         private fun hasStepsBefore(element: PsiElement): Boolean {
             var el: PsiElement? = element.prevSibling
             while (el != null && el !is GherkinStep) {

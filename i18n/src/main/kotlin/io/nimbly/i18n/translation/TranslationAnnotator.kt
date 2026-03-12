@@ -12,6 +12,7 @@ import com.intellij.pom.Navigatable
 import com.intellij.psi.PsiElement
 import com.intellij.refactoring.suggested.endOffset
 import com.intellij.refactoring.suggested.startOffset
+import io.nimbly.i18n.TranslationPlusSettings
 import io.nimbly.i18n.util.*
 import java.awt.Color
 import javax.swing.SwingUtilities
@@ -20,7 +21,7 @@ import javax.swing.SwingUtilities
 class TranslationAnnotator : Annotator {
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
 
-        if (!RefactoringSetup().useRefactoring)
+        if (!TranslationPlusSettings.getSettings().useRefactoring)
             return
 
         val document = element.getDocument()

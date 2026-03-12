@@ -24,7 +24,9 @@ import icons.ActionIcons
 import io.nimbly.tzatziki.psi.*
 import io.nimbly.tzatziki.util.findTableAt
 import org.jetbrains.plugins.cucumber.psi.GherkinFile
+import org.jetbrains.plugins.cucumber.psi.GherkinTable
 import org.jetbrains.plugins.cucumber.psi.GherkinTableCell
+import org.jetbrains.plugins.cucumber.psi.GherkinTableRow
 import org.jetbrains.plugins.cucumber.psi.impl.GherkinTableHeaderRowImpl
 
 class TzCellCompletion: CompletionContributor() {
@@ -35,33 +37,32 @@ class TzCellCompletion: CompletionContributor() {
         if (cell !is GherkinTableCell)
             return
 
+        val file = cell.containingFile
+        if (file !is GherkinFile)
+            return
+        val tables = file.findAllTables()
+
         if (cell.parent is GherkinTableHeaderRowImpl) {
-            completeHeader(cell, resultSet)
+            completeHeader(cell, tables, resultSet)
         }
         else {
-            completeData(cell, resultSet)
+            completeData(cell, tables, resultSet)
         }
     }
 
     /**
      * Complete Header
      */
-    private fun completeHeader(cell: GherkinTableCell, resultSet: CompletionResultSet) {
-
-        // Find all tables
-        val file = cell.containingFile
-        if (file !is GherkinFile)
-            return
-        val tables = file.findAllTables()
+    private fun completeHeader(cell: GherkinTableCell, tables: List<GherkinTable>, resultSet: CompletionResultSet) {
 
         // Find all values
+        @Suppress("UNCHECKED_CAST")
         val values: Set<String> = tables
             .mapNotNull { it.headerRow }
-            .flatMap { it.psiCells }
+            .flatMap { it.psiCells as List<GherkinTableCell> }
             .filter { it != cell }
             .map { it.text.trim() }
-            .filter { it.isNotBlank() }
-            .toSet()
+            .filterTo(mutableSetOf()) { it.isNotBlank() }
 
         // Create a new cell to chain completion
         var suffix = ""
@@ -94,43 +95,39 @@ class TzCellCompletion: CompletionContributor() {
     /**
      * Complete Data
      */
-    private fun completeData(cell: GherkinTableCell, resultSet: CompletionResultSet) {
+    private fun completeData(cell: GherkinTableCell, tables: List<GherkinTable>, resultSet: CompletionResultSet) {
 
         // Find column name
-        val columnName = cell.row.table.headerRow?.psiCells?.get(cell.columnNumber)?.text?.trim()
+        @Suppress("UNCHECKED_CAST")
+        val headerCells = cell.row.table.headerRow?.psiCells as? List<GherkinTableCell> ?: return
+        val columnName = headerCells.getOrNull(cell.columnNumber)?.text?.trim()
             ?: return
 
-        // Find all tables
-        val file = cell.containingFile
-        if (file !is GherkinFile)
-            return
-        val tables = file.findAllTables()
-
-        // Find all values
-        val values = mutableListOf<String>()
+        // Build frequency map directly (avoids intermediate list + groupingBy)
+        val valueFreq = mutableMapOf<String, Int>()
         tables.forEach { table ->
             val header = table.headerRow
             if (header != null) {
-                val index = header.psiCells.indexOfFirst { it.text.trim() == columnName }
+                @Suppress("UNCHECKED_CAST")
+                val hdrCells = header.psiCells as List<GherkinTableCell>
+                val index = hdrCells.indexOfFirst { it.text.trim() == columnName }
                 if (index >= 0) {
-                    table.dataRows.forEach { row ->
+                    @Suppress("UNCHECKED_CAST")
+                    val rows = table.dataRows as List<GherkinTableRow>
+                    for (row in rows) {
                         val c = row.cell(index)
-                        if (c!=cell) {
+                        if (c != cell) {
                             val txt = c.text.trim()
                             if (txt.isNotBlank())
-                                values.add(txt)
+                                valueFreq[txt] = (valueFreq[txt] ?: 0) + 1
                         }
                     }
                 }
             }
         }
 
-        // Group by number of use
-        val groupBy: Map<String, Int>
-                = values.groupingBy { it }.eachCount()
-
         // Add all values to completion
-        groupBy.forEach { (value, count) ->
+        valueFreq.forEach { (value, count) ->
             val lookup = LookupElementBuilder.create(value)
                 .withPresentableText(value)
                 .withTypeText("(used $count times)")

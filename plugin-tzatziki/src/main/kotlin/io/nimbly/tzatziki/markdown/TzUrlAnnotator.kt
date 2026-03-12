@@ -36,6 +36,10 @@ val REGX_URL_MAKD = Regex("\\[(.*?)]\\((.*?)\\)")
  */
 class TzUrlAnnotator : Annotator {
 
+    companion object {
+        private val ANNOTATOR_REGEXES = listOf(REGX_IMG_HTML, REGX_URL_MAKD)
+    }
+
     override fun annotate(element: PsiElement, holder: AnnotationHolder) {
 
         if (!TOGGLE_CUCUMBER_PL)
@@ -45,7 +49,7 @@ class TzUrlAnnotator : Annotator {
             return
 
         val text = element.text
-        listOf(REGX_IMG_HTML, REGX_URL_MAKD).forEach { reg ->
+        ANNOTATOR_REGEXES.forEach { reg ->
             reg.findAll(text)
                 .mapNotNull { it.groups.last() }
                 .filter { !it.range.isEmpty()}

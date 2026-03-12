@@ -15,6 +15,7 @@
 
 package io.nimbly.tzatziki.actions
 
+import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -24,6 +25,8 @@ import io.nimbly.tzatziki.TOGGLE_CUCUMBER_PL
 import io.nimbly.tzatziki.mouse.TzSelectionModeManager.disableColumnSelectionMode
 import org.jetbrains.plugins.cucumber.psi.GherkinFileType
 
+private const val ENABLED_KEY = "io.nimbly.tzatziki.enabled"
+
 class TzToggleTzatzikiAction : ToggleAction(), DumbAware {
 
     override fun isSelected(e: AnActionEvent)
@@ -31,6 +34,7 @@ class TzToggleTzatzikiAction : ToggleAction(), DumbAware {
 
     override fun setSelected(e: AnActionEvent, state: Boolean) {
         TOGGLE_CUCUMBER_PL = !TOGGLE_CUCUMBER_PL
+        PropertiesComponent.getInstance().setValue(ENABLED_KEY, TOGGLE_CUCUMBER_PL, true)
         if (!TOGGLE_CUCUMBER_PL)
             e.getData(CommonDataKeys.EDITOR)?.disableColumnSelectionMode()
     }

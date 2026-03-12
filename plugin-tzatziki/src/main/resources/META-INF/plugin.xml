@@ -269,6 +269,10 @@
 <!--        <projectService serviceImplementation="io.nimbly.tzatziki.services.TzPersistenceStateService"/>-->
 <!--        <projectService serviceImplementation="io.nimbly.tzatziki.services.TzFileService"/>-->
 
+        // Cucumber+ settings page under Tools menu
+        <projectConfigurable instance="io.nimbly.tzatziki.preferences.CucumberPlusOptionsConfigurable"
+                             displayName="Cucumber+" id="io.nimbly.tzatziki.preferences" parentId="tools" groupWeight="2" />
+
         // New UI 2023 Icons mapping to "expUI" folder
         <iconMapper mappingFile="TzatzikiIconMappings.json"/>
 

@@ -148,7 +148,8 @@ class TzCucumberStepReference(private val myStep: PsiElement, private val myRang
                 }
             }
         }
-        return Array(resolved.size) { PsiElementResolveResult(resolved[it]) }
+        val resolvedList = resolved.toList()
+        return Array(resolvedList.size) { PsiElementResolveResult(resolvedList[it]) }
     }
 
     private class MyResolver : ResolveCache.PolyVariantResolver<TzCucumberStepReference> {

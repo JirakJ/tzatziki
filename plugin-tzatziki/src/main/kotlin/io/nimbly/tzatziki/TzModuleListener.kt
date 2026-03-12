@@ -15,6 +15,7 @@
 
 package io.nimbly.tzatziki
 
+import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.IdeActions.*
@@ -38,7 +39,9 @@ import io.nimbly.tzatziki.psi.format
 import io.nimbly.tzatziki.util.*
 import org.jetbrains.plugins.cucumber.psi.GherkinFileType
 
-var TOGGLE_CUCUMBER_PL: Boolean = true
+private const val ENABLED_KEY = "io.nimbly.tzatziki.enabled"
+
+@Volatile var TOGGLE_CUCUMBER_PL: Boolean = PropertiesComponent.getInstance().getBoolean(ENABLED_KEY, true)
 
 const val EDITOR_UNINDENT_SELECTION = "EditorUnindentSelection"
 
@@ -185,7 +188,7 @@ class TzPostStartup : StartupActivity {
     }
 
     companion object {
-        private var handlerInitialized = false
+        @Volatile private var handlerInitialized = false
     }
 
 }
