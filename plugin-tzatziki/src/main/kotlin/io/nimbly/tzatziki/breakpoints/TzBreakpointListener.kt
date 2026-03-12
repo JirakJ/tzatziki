@@ -138,7 +138,10 @@ class TzBreakpointListener : StartupActivity {
                         // Sync row breakpoint if all step's breakpoint has same state
                         val state = gherkinBreakpoint.isEnabled
                         if (gherkinBreakpoint.isEnabled ||
-                            scenario.allExamples().filter { it != row }.find { it.findBreakpoint() != null && it.findBreakpoint()?.isEnabled != gherkinBreakpoint.isEnabled } == null) {
+                            scenario.allExamples().filter { it != row }.find { exampleRow ->
+                                val bp = exampleRow.findBreakpoint()
+                                bp != null && bp.isEnabled != gherkinBreakpoint.isEnabled
+                            } == null) {
 
                             scenario.steps.forEach {
                                 it.enableBreakpoints(state)
@@ -222,7 +225,10 @@ class TzBreakpointListener : StartupActivity {
                         if (scenario != null) {
 
                             if (gherkinBreakpoint.isEnabled ||
-                                scenario.steps.filter { it != step }.find { it.findBreakpoint() != null && it.findBreakpoint()?.isEnabled != gherkinBreakpoint.isEnabled } == null) {
+                                scenario.steps.filter { it != step }.find { s ->
+                                    val bp = s.findBreakpoint()
+                                    bp != null && bp.isEnabled != gherkinBreakpoint.isEnabled
+                                } == null) {
 
                                 scenario.allExamples().forEach {
                                     it.enableBreakpoints(state)
@@ -257,9 +263,7 @@ class TzBreakpointListener : StartupActivity {
 
                             if (createdFromCode) {
 
-                                val oldStepBreakpoints = XDebuggerManager.getInstance(step.project).breakpointManager.allBreakpoints
-                                    .filter { it.sourcePosition?.file == step.containingFile.virtualFile }
-                                    .filter { it.sourcePosition?.line == step.getDocumentLine() }
+                                val oldStepBreakpoints = step.findBreakpointsOnLine()
 
                                 if (oldStepBreakpoints.isEmpty()) {
                                     step.toggleGherkinBreakpoint(documentLine)
@@ -279,10 +283,7 @@ class TzBreakpointListener : StartupActivity {
     }
 
     private fun GherkinPsiElement.enableBreakpoints(enabled: Boolean) {
-        val oldBreakpoints = XDebuggerManager.getInstance(project).breakpointManager.allBreakpoints
-            .filter { it.sourcePosition?.file == containingFile.virtualFile }
-            .filter { it.sourcePosition?.line == getDocumentLine() }
-        oldBreakpoints.forEach { b ->
+        findBreakpointsOnLine().forEach { b ->
             b.isEnabled = enabled
         }
     }

@@ -41,11 +41,13 @@ abstract class TzStepsUsagesMarker : LineMarkerProvider {
         result: MutableCollection<in LineMarkerInfo<*>>
     ) {
         // Group usages by regex
-        val groupedByRegex: Map<String, List<GherkinStep>> = usages.map { it.element }
+        val groupedByRegex: Map<String, List<GherkinStep>> = usages.asSequence()
+            .map { it.element }
             .filterIsInstance<GherkinStep>()
             .flatMap { step ->
                 step.findDefinitions()
                     .toSet()
+                    .asSequence()
                     .mapNotNull { it.expression }
                     .map { it to step }
             }

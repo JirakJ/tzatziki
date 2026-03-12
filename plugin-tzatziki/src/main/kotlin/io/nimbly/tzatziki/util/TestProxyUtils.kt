@@ -45,7 +45,8 @@ fun SMTestProxy.isExample(project: Project): Boolean {
 }
 
 fun SMTestProxy.findElement(project: Project): PsiElement? {
-    var location = getLocation(project, GlobalSearchScope.allScope(project))
+    val scope = GlobalSearchScope.projectScope(project)
+    var location = getLocation(project, scope)
     if (location == null) {
 
         // Workaround for path location issue
@@ -54,7 +55,7 @@ fun SMTestProxy.findElement(project: Project): PsiElement? {
         if (url?.startsWith("file://file://") == true) {
             val fake = SMTestProxy(name, isSuite, "file://" + url.substring(14), metainfo, isPreservePresentableName)
             fake.locator = locator
-            location = fake.getLocation(project, GlobalSearchScope.allScope(project))
+            location = fake.getLocation(project, scope)
         }
     }
 

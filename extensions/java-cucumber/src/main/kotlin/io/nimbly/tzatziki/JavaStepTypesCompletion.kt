@@ -50,7 +50,8 @@ class JavaStepTypesCompletion : TzStepTypesCompletion() {
         val parameterTypeClass = JavaPsiFacade.getInstance(project).findClass("io.cucumber.java.ParameterType", projectScope)
         if (parameterTypeClass != null) {
 
-            AnnotatedElementsSearch.searchPsiMethods(parameterTypeClass, projectScope).forEach { psiMethod ->
+            val searchScope = GlobalSearchScope.projectScope(project)
+            AnnotatedElementsSearch.searchPsiMethods(parameterTypeClass, searchScope).forEach { psiMethod ->
                 val lookup = LookupElementBuilder.create(psiMethod.name)
                     .withPresentableText("{" + psiMethod.name + "}")
                     .withIcon(psiMethod.getIcon(0))

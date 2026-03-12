@@ -21,18 +21,23 @@ fun GherkinStep.updatePresentation(codeBreakpoints: List<XBreakpoint<*>>) {
     val enabled = codeBreakpoints.count { it.isEnabled }
     val condition = codeBreakpoints.mapNotNull { it.conditionExpression }.firstOrNull()
 
-    val stepBreakpoints = XDebuggerManager.getInstance(project).breakpointManager.allBreakpoints
-        .filter { it.sourcePosition?.file == containingFile.virtualFile }
-        .filter { it.sourcePosition?.line == getDocumentLine() }
-    stepBreakpoints.forEach { b ->
+    findBreakpointsOnLine().forEach { b ->
         b.isEnabled = enabled > 0
     }
 }
 
-fun PsiElement.findBreakpoint(): XBreakpoint<*>? {
+fun PsiElement.findBreakpointsOnLine(): List<XBreakpoint<*>> {
+    val vfile = containingFile.virtualFile
+    val line = getDocumentLine()
     return XDebuggerManager.getInstance(project).breakpointManager.allBreakpoints
-        .filter { it.sourcePosition?.file == containingFile.virtualFile }
-        .firstOrNull { it.sourcePosition?.line == getDocumentLine() }
+        .filter { it.sourcePosition?.file == vfile && it.sourcePosition?.line == line }
+}
+
+fun PsiElement.findBreakpoint(): XBreakpoint<*>? {
+    val vfile = containingFile.virtualFile
+    val line = getDocumentLine()
+    return XDebuggerManager.getInstance(project).breakpointManager.allBreakpoints
+        .firstOrNull { it.sourcePosition?.file == vfile && it.sourcePosition?.line == line }
 }
 
 fun GherkinPsiElement.toggleGherkinBreakpoint(documentLine: Int) {
@@ -65,10 +70,7 @@ fun toggleAndReturnLineBreakpoint(
 }
 
 fun GherkinPsiElement.deleteBreakpoints() {
-    val oldBreakpoints = XDebuggerManager.getInstance(project).breakpointManager.allBreakpoints
-        .filter { it.sourcePosition?.file == containingFile.virtualFile }
-        .filter { it.sourcePosition?.line == getDocumentLine() }
-    oldBreakpoints.forEach { b ->
+    findBreakpointsOnLine().forEach { b ->
         XDebuggerUtil.getInstance().removeBreakpoint(project, b)
     }
 }

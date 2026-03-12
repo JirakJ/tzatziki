@@ -135,20 +135,11 @@ fun Project.getGherkinScope(): GlobalSearchScope {
 fun AbstractStepDefinition.isDeprecated(): Boolean {
     val element = element
         ?: return false
-
-    Tzatziki().extensionList.forEach {
-        if (it.isDeprecated(element))
-            return true
-    }
-    return false;
+    return Tzatziki().extensionList.any { it.isDeprecated(element) }
 }
 
 fun PsiElement.isDeprecated(): Boolean {
-    Tzatziki().extensionList.forEach {
-        if (it.isDeprecated(this))
-            return true
-    }
-    return false;
+    return Tzatziki().extensionList.any { it.isDeprecated(this) }
 }
 
 fun GherkinStep.findCucumberStepReference(): CucumberStepReference?
