@@ -39,11 +39,11 @@ object Tzatziki {
     operator fun invoke(): ExtensionPointName<TzatzikiExtensionPoint> = EP_NAME
 
     fun findSteps(vfile: VirtualFile?, offset: Int?): List<GherkinStep> {
-        return findStepsAndBreakpoints(vfile, offset)?.first ?: listOf()
+        return findStepsAndBreakpoints(vfile, offset)?.first ?: emptyList()
     }
 
     fun findBreakpoints(vfile: VirtualFile?, offset: Int?): List<XBreakpoint<*>> {
-        return findStepsAndBreakpoints(vfile, offset)?.second ?: listOf()
+        return findStepsAndBreakpoints(vfile, offset)?.second ?: emptyList()
     }
 
     fun findStepsAndBreakpoints(vfile: VirtualFile?, offset: Int?): Pair<List<GherkinStep>, List<XBreakpoint<*>>>? {

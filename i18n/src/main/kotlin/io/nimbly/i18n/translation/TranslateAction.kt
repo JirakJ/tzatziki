@@ -46,6 +46,8 @@ import io.nimbly.i18n.translation.engines.Translation
 import io.nimbly.i18n.translation.engines.TranslationEngineFactory
 import io.nimbly.i18n.util.*
 
+private val UNICODE_WORD_REGEX = "[\\p{L}\\p{N}\\p{M}]+".toRegex()
+
 open class TranslateAction : DumbAwareAction()  {
 
     override fun getActionUpdateThread() = ActionUpdateThread.EDT
@@ -173,7 +175,7 @@ open class TranslateAction : DumbAwareAction()  {
             }
 
             if (caret == startOffset
-                    && (text.isBlank() || text.replace("[\\p{L}\\p{N}\\p{M}]+".toRegex(), "").isNotBlank() && caret > 1)) {
+                    && (text.isBlank() || text.replace(UNICODE_WORD_REGEX, "").isNotBlank() && caret > 1)) {
 
                 val ll = file.findElementAt(caret - 1) ?: return
                 startOffset = ll.textRange.startOffset

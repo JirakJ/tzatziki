@@ -28,10 +28,12 @@ class Path(val path : String)
 
 val PAGE_COUNTER = "'Page ' counter(page) ' / ' counter(pages);"
 
+private val XML_DECLARATION_REGEX = Regex("<\\?(XML).+?>", RegexOption.IGNORE_CASE)
+
 fun buildPdf(generator: PdfBuilder, outputStream: OutputStream) {
 
     val generated = generator.generate()
-        .replace(Regex("<\\?(XML).+?>", option = RegexOption.IGNORE_CASE), "");
+        .replace(XML_DECLARATION_REGEX, "");
 
     PdfRendererBuilder().apply {
         useFastMode()

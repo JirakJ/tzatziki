@@ -25,6 +25,10 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.URLEncoder
 
+private val XXXXXXX_REGEX = Regex("\\(\\s?XXXXXXX\\s?\\)")
+private val ZERO_WIDTH_SPACE_REGEX = Regex("\\u200b")
+private val NON_BREAKING_SPACE_REGEX = Regex("\\u00A0")
+
 class GoogleEngineFree : IEngine {
 
     override val type = EEngine.GOOGLE
@@ -84,7 +88,7 @@ class GoogleEngineFree : IEngine {
         val parsed = parseResult(response.toString(), langFrom)
 
         val sentence3 = parsed?.translated
-            ?.replace(Regex("\\(\\s?XXXXXXX\\s?\\)"), newlineChar)
+            ?.replace(XXXXXXX_REGEX, newlineChar)
             ?: return null
 
         var sentence4 = sentence3.split(newlineChar)
@@ -131,8 +135,8 @@ class GoogleEngineFree : IEngine {
 
             val asString = elt4.asJsonPrimitive.asString
 
-            val fixUnicodeBlank = asString.replace(Regex("\\u200b"), "")
-            val fixNonBreakableSpace = fixUnicodeBlank.replace(Regex("\\u00A0"), " ")
+            val fixUnicodeBlank = asString.replace(ZERO_WIDTH_SPACE_REGEX, "")
+            val fixNonBreakableSpace = fixUnicodeBlank.replace(NON_BREAKING_SPACE_REGEX, " ")
             txt.append(fixNonBreakableSpace)
         }
 

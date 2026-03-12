@@ -198,8 +198,9 @@ class TzExecutionCucumberListener : StartupActivity {
                             ApplicationManager.getApplication().runReadAction {
 
                                 val file = vfile.getFile(project) ?: return@runReadAction
-                                val offsetStart = file.getDocument()?.getLineStartOffset(line - 1) ?: return@runReadAction
-                                val offsetEnd = file.getDocument()?.getLineEndOffset(line - 1) ?: return@runReadAction
+                                val doc = file.getDocument() ?: return@runReadAction
+                                val offsetStart = doc.getLineStartOffset(line - 1)
+                                val offsetEnd = doc.getLineEndOffset(line - 1)
 
                                 val lineStart =
                                     if (isExample) {

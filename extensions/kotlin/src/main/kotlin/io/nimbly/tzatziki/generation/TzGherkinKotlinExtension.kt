@@ -26,6 +26,8 @@ import org.jetbrains.plugins.cucumber.java.steps.AnnotationPackageProvider
 import org.jetbrains.plugins.cucumber.psi.GherkinStep
 import java.util.*
 
+private val STEP_PARAM_REGEX = "<\\w+>".toRegex()
+
 /**
  * @see <a href="https://github.com/jlagerweij/cucumber-kotlin/blob/master/src/main/kotlin/net/lagerwey/plugins/cucumber/kotlin/steps/KotlinStepDefinitionCreator.kt">Kotlin plugin</a>
  */
@@ -99,7 +101,7 @@ class TzGherkinKotlinExtension : TzGherkinJavaExtension() {
             if (CucumberJavaUtil.isCucumberExpressionsAvailable(step)) {
                 snippet = generator.getSnippet(createStep(FakeStep(step)), TzFunctionNameGenerator(CamelCaseConcatenator()))
                 snippet = replaceRegexpWithCucumberExpression(snippet, step.name)
-                    .replace("<\\w+>".toRegex(), "{}")
+                    .replace(STEP_PARAM_REGEX, "{}")
             }
             else {
                 snippet = generator.getSnippet(createStep(step), TzFunctionNameGenerator(CamelCaseConcatenator()))

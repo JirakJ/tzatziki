@@ -58,11 +58,12 @@ class JavaTzatzikiExtensionPoint : TzatzikiExtensionPoint {
         val stepReferences = findStepUsages(method)
         val steps = stepReferences.map { it.element }.filterIsInstance<GherkinStep>()
 
+        val methodVFile = method.containingFile.originalFile.virtualFile
         val allBreakpoints = DebuggerManagerEx.getInstanceEx(project)
             .breakpointManager
             .breakpoints
             .filter { method.textRange.contains( it.xBreakpoint.sourcePosition?.offset ?: -1) }
-            .filter { it.evaluationElement?.containingFile?.originalFile?.virtualFile == method.containingFile.originalFile.virtualFile }
+            .filter { it.evaluationElement?.containingFile?.originalFile?.virtualFile == methodVFile }
             .map { it.xBreakpoint }
 
         return steps to allBreakpoints

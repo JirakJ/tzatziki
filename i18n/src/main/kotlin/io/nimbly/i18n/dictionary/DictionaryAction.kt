@@ -29,6 +29,8 @@ import icons.ActionI18nIcons
 import io.nimbly.i18n.util.*
 import io.nimbly.i18n.util.EHint.DEFINITION
 
+private val UNICODE_WORD_REGEX = "[\\p{L}\\p{N}\\p{M}]+".toRegex()
+
 open class DictionaryAction : AnAction() , DumbAware {
 
     override fun getActionUpdateThread() = ActionUpdateThread.BGT
@@ -75,7 +77,7 @@ open class DictionaryAction : AnAction() , DumbAware {
             text = element.text
 
             if (caret == startOffset
-                    && (text.isBlank() || text.replace("[\\p{L}\\p{N}\\p{M}]+".toRegex(), "").isNotBlank() && caret > 1)) {
+                    && (text.isBlank() || text.replace(UNICODE_WORD_REGEX, "").isNotBlank() && caret > 1)) {
 
                 val l = file.findElementAt(caret - 1) ?: return
                 startOffset = l.textRange.startOffset

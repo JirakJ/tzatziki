@@ -44,6 +44,8 @@ import java.awt.Dimension
 import java.awt.Point
 import java.util.function.Consumer
 
+private val WHITESPACE_PIPE_REGEX = Regex("^[ |]+\$")
+
 fun Editor.findTableAt(offset: Int): GherkinTable? {
     val file = file ?: return null
 
@@ -307,7 +309,7 @@ fun Editor.isSelectionOfBlankCells(): Boolean {
     selectionModel.blockSelectionStarts.forEachIndexed { index, start ->
         val end = selectionModel.blockSelectionEnds[index]
         val text = document.getText(TextRange(start, end))
-        if (!text.matches(Regex("^[ |]+\$")))
+        if (!text.matches(WHITESPACE_PIPE_REGEX))
             return false
     }
 

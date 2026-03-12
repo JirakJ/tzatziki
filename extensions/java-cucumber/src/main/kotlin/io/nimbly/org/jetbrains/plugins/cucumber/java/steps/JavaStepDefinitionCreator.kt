@@ -34,6 +34,8 @@ import org.jetbrains.plugins.cucumber.java.steps.AnnotationPackageProvider
 import org.jetbrains.plugins.cucumber.psi.GherkinStep
 import java.util.*
 
+private val STEP_PARAM_REGEX = "<\\w+>".toRegex()
+
 // See https://github.com/JetBrains/intellij-plugins/tree/master/cucumber-java
 open class JavaStepDefinitionCreator : AbstractStepDefinitionCreator() {
 
@@ -200,7 +202,7 @@ open class JavaStepDefinitionCreator : AbstractStepDefinitionCreator() {
 
     class FakeStep(val step: GherkinStep) {
         val name
-            get() = step.name.replace("<\\w+>".toRegex(), "@\"\"@")
+            get() = step.name.replace(STEP_PARAM_REGEX, "@\"\"@")
 
         val keyword
             get() = step.keyword
@@ -221,7 +223,7 @@ open class JavaStepDefinitionCreator : AbstractStepDefinitionCreator() {
         if (CucumberJavaUtil.isCucumberExpressionsAvailable(step)) {
             snippet = generator.getSnippet(createStep(FakeStep(step)), TzFunctionNameGenerator(CamelCaseConcatenator()))
             snippet = replaceRegexpWithCucumberExpression(snippet, step.name)
-                        .replace("<\\w+>".toRegex(), "{}")
+                        .replace(STEP_PARAM_REGEX, "{}")
         }
         else {
             snippet = generator.getSnippet(createStep(step), TzFunctionNameGenerator(CamelCaseConcatenator()))
@@ -230,7 +232,7 @@ open class JavaStepDefinitionCreator : AbstractStepDefinitionCreator() {
             snippet = "@When" + snippet.substring(2)
         }
 
-        snippet = snippet.replaceFirst("@".toRegex(), methodAnnotation)
+        snippet = snippet.replaceFirst("@", methodAnnotation)
         snippet = processGeneratedStepDefinition(snippet, step)
         val factory = jvmElementFactory(file, step)
         val methodFromCucumberLibraryTemplate = factory.createMethodFromText(snippet, step)
@@ -271,7 +273,7 @@ open class JavaStepDefinitionCreator : AbstractStepDefinitionCreator() {
                 val result = generator.generateExpressions(step)[0]
                 if (result != null) {
                     val cucumberExpression = JavaSnippet().escapePattern(result.source)
-                    val lines = snippet.split("\n".toRegex()).dropLastWhile { it.isEmpty() }
+                    val lines = snippet.split("\n").dropLastWhile { it.isEmpty() }
                         .toTypedArray()
                     val start = lines[0].indexOf('(') + 1
                     lines[0] = lines[0].substring(0, start + 1) + cucumberExpression + "\")"

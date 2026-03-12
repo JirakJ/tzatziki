@@ -195,7 +195,7 @@ fun Editor.stopBeforeDeletion(cleanCells: Boolean, cleanHeader: Boolean): Boolea
             return false
 
         val text = selectionModel.getSelectedText(true)
-        if (text != null && text.contains(Regex("[\\n|]"))) {
+        if (text != null && (text.contains('\n') || text.contains('|'))) {
             if (!cleanCells && !cleanHeader)
                 return true
 

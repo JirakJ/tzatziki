@@ -162,9 +162,10 @@ class TzBreakpointListener : StartupActivity {
                         it.findBestPositionToAddBreakpoint(stepDefinitions)
                     } ?: return
 
+                    val codeFile = codeElement.first.containingFile
                     val allCodeBreakpoints = Tzatziki.findStepsAndBreakpoints(
-                        codeElement.first.containingFile.virtualFile,
-                        codeElement.first.containingFile.getDocument()?.getLineStartOffset(codeElement.second)
+                        codeFile.virtualFile,
+                        codeFile.getDocument()?.getLineStartOffset(codeElement.second)
                     )
 
                     if (action == EAction.ADDED) {
