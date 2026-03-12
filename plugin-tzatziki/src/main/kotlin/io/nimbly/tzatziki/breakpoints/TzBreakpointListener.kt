@@ -140,9 +140,8 @@ class TzBreakpointListener : StartupActivity {
                         val state = gherkinBreakpoint.isEnabled
                         val allExamples = scenario.allExamples()
                         if (gherkinBreakpoint.isEnabled ||
-                            !allExamples.filter { it != row }.any { exampleRow ->
-                                val bp = exampleRow.findBreakpoint()
-                                bp != null && bp.isEnabled != gherkinBreakpoint.isEnabled
+                            !allExamples.any { it != row &&
+                                it.findBreakpoint()?.let { bp -> bp.isEnabled != gherkinBreakpoint.isEnabled } == true
                             }) {
 
                             scenario.steps.forEach {
@@ -229,9 +228,8 @@ class TzBreakpointListener : StartupActivity {
                             val allExamples = scenario.allExamples()
 
                             if (gherkinBreakpoint.isEnabled ||
-                                !scenario.steps.filter { it != step }.any { s ->
-                                    val bp = s.findBreakpoint()
-                                    bp != null && bp.isEnabled != gherkinBreakpoint.isEnabled
+                                !scenario.steps.any { it != step &&
+                                    it.findBreakpoint()?.let { bp -> bp.isEnabled != gherkinBreakpoint.isEnabled } == true
                                 }) {
 
                                 allExamples.forEach {

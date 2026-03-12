@@ -61,15 +61,19 @@ class KotlinTzatzikiExtensionPoint : TzatzikiExtensionPoint {
             return null
 
         val stepReferences = findUsages(fcts)
-        val steps = stepReferences.map { it.element }.filterIsInstance<GherkinStep>()
+        val steps = stepReferences.mapNotNull { it.element as? GherkinStep }
 
         val fctsVFile = fcts.containingFile.originalFile.virtualFile
         val allBreakpoints = DebuggerManagerEx.getInstanceEx(project)
             .breakpointManager
             .breakpoints
-            .filter { fcts.textRange.contains( it.xBreakpoint.sourcePosition?.offset ?: -1) }
-            .filter { it.evaluationElement?.containingFile?.originalFile?.virtualFile == fctsVFile }
+            .asSequence()
+            .filter {
+                fcts.textRange.contains(it.xBreakpoint.sourcePosition?.offset ?: -1) &&
+                it.evaluationElement?.containingFile?.originalFile?.virtualFile == fctsVFile
+            }
             .map { it.xBreakpoint }
+            .toList()
 
         return steps to allBreakpoints
     }

@@ -72,8 +72,9 @@ class FeaturePanel(val project: Project) : SimpleToolWindowPanel(true), Disposab
         val treeExpander = DefaultTreeExpander(tree)
 
         val group = DefaultActionGroup().also {
-            it.add(CommonActionsManager.getInstance().createExpandAllAction(treeExpander, this))
-            it.add(CommonActionsManager.getInstance().createCollapseAllAction(treeExpander, this))
+            val actionsManager = CommonActionsManager.getInstance()
+            it.add(actionsManager.createExpandAllAction(treeExpander, this))
+            it.add(actionsManager.createCollapseAllAction(treeExpander, this))
             it.add(LocateAction(this))
             it.addSeparator(" ")
             it.add(SourcePathOnlyAction(this))

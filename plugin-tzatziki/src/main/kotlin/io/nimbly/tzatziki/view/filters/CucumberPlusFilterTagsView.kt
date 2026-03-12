@@ -203,7 +203,7 @@ class CucumberPlusFilterTagsView(val project: Project) : SimpleToolWindowPanel(t
                 tzService.selection = tSelection.text
             }
             else {
-                val checked = checks.filter { it.isSelected }.mapNotNull { it.text }.map { "@$it" }
+                val checked = checks.mapNotNull { if (it.isSelected) "@${it.text}" else null }
                 tSelection.text = checked.joinToString(" or ")
 
                 tzService.selection = tSelection.text

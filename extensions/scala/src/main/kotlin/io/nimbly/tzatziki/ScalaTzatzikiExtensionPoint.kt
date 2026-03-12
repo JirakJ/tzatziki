@@ -96,9 +96,13 @@ class ScalaTzatzikiExtensionPoint : TzatzikiExtensionPoint {
         val allBreakpoints = DebuggerManagerEx.getInstanceEx(project)
             .breakpointManager
             .breakpoints
-            .filter { method.textRange.contains( it.xBreakpoint.sourcePosition?.offset ?: -1) }
-            .filter { it.evaluationElement?.containingFile?.originalFile?.virtualFile == methodVFile }
+            .asSequence()
+            .filter {
+                method.textRange.contains(it.xBreakpoint.sourcePosition?.offset ?: -1) &&
+                it.evaluationElement?.containingFile?.originalFile?.virtualFile == methodVFile
+            }
             .map { it.xBreakpoint }
+            .toList()
 
         return steps to allBreakpoints
     }

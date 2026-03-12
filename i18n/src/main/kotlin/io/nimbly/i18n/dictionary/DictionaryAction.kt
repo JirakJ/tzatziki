@@ -111,7 +111,7 @@ open class DictionaryAction : AnAction() , DumbAware {
 
         val translationLines =
             if (def.status == EStatut.NOT_FOUND) {
-                listOf("No definition found").toMutableList()
+                mutableListOf("No definition found")
             }
             else {
                 def.result!!.meanings

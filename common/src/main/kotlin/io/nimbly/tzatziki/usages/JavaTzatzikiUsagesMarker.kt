@@ -46,7 +46,6 @@ abstract class TzStepsUsagesMarker : LineMarkerProvider {
             .filterIsInstance<GherkinStep>()
             .flatMap { step ->
                 step.findDefinitions()
-                    .toSet()
                     .asSequence()
                     .mapNotNull { it.expression }
                     .map { it to step }

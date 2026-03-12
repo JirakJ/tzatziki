@@ -81,9 +81,10 @@ fun GherkinTableRow.createRowAfter(): GherkinTableRow {
             "Scenario Outline: xx\n" +
             "Examples: xxx\n"
 
-    var rowString = "|"
-    for (int in 1..cellCount)
-        rowString += " |"
+    var rowString = buildString {
+        append("|")
+        repeat(cellCount) { append(" |") }
+    }
 
     val tempTable = CucumberElementFactory.createTempPsiFile(project, header + rowString + '\n' + rowString)
         .children[0].children[0].children[0].children[0]

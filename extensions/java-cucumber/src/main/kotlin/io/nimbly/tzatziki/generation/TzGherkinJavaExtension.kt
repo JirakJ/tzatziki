@@ -25,7 +25,7 @@ open class TzGherkinJavaExtension : CucumberJavaExtension() {
 
         override fun createStep(step: GherkinStep): Step {
             return Step(
-                ArrayList(),
+                emptyList(),
                 step.keyword.text.fixName(),
                 step.name, //.stripAccents(),
                 0,

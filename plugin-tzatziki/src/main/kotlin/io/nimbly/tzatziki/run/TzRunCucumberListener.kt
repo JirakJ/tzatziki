@@ -102,7 +102,7 @@ class TzExecutionCucumberListener : StartupActivity {
         fun removeHighlighters() {
 
             val model = this.highlightersModel ?: return
-            val copy = this.highlighters.toList() ?: return
+            val copy = this.highlighters.toList()
 
             this.highlighters.clear()
 

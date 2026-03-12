@@ -82,8 +82,8 @@ open class TableShiftAction(private val direction: Direction) : TzAction() {
 private fun Editor.shift(table: GherkinTable, cell: GherkinTableCell, direction: Direction) {
 
     // build columns and rows indexes
-    val columnsIdx = (0 until table.columnCount).map { it }.toMutableList()
-    val rowsIdx = (0 until table.rowCount).map { it }.toMutableList()
+    val columnsIdx = (0 until table.columnCount).toMutableList()
+    val rowsIdx = (0 until table.rowCount).toMutableList()
 
     // Remember position
     val coordinate = cell.coordinate

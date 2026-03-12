@@ -36,7 +36,6 @@ import org.jetbrains.plugins.cucumber.psi.impl.GherkinStepImpl
 import org.jetbrains.plugins.cucumber.steps.AbstractStepDefinition
 import org.jetbrains.plugins.cucumber.steps.CucumberStepHelper
 import java.util.*
-import java.util.stream.Collectors
 
 
 val LAST_VALID = Key<Array<ResolveResult>>("LAST_VALID")
@@ -117,15 +116,14 @@ class TzCucumberStepReference(private val myStep: PsiElement, private val myRang
             ?: return ResolveResult.EMPTY_ARRAY
 
         val frameworks = CucumberJvmExtensionPoint.EP_NAME.extensionList
-        val stepVariants: Collection<String?> =
-            frameworks.stream().map { e: CucumberJvmExtensionPoint -> e.getStepName(myStep) }
-                .filter { obj: String? -> Objects.nonNull(obj) }.collect(Collectors.toSet())
+        val stepVariants: Set<String> =
+            frameworks.mapNotNull { it.getStepName(myStep) }.toSet()
         if (stepVariants.isEmpty())
             return ResolveResult.EMPTY_ARRAY
 
         val featureFile = myStep.containingFile
         val stepDefinitions = CachedValuesManager.getCachedValue(featureFile) {
-            val allStepDefinition: MutableList<AbstractStepDefinition> = ArrayList()
+            val allStepDefinition: MutableList<AbstractStepDefinition> = ArrayList(32)
             for (e in frameworks) {
                 val def = e.loadStepsFor(featureFile, module)
                 if (def != null) {
