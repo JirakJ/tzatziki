@@ -80,6 +80,10 @@ class TzExecutionCucumberListener : StartupActivity {
         var highlightersModel: MarkupModel? = null
     ) {
 
+        companion object {
+            private val WINDOWS_DRIVE_REGEX = "^[A-Z]:.*".toRegex()
+        }
+
         fun clear() {
             featurePath = null
             lineNumber = null
@@ -111,7 +115,7 @@ class TzExecutionCucumberListener : StartupActivity {
 
         fun findFile(): VirtualFile? {
             var p = featurePath ?: return null
-            if (!p.matches("^[A-Z]:.*".toRegex()))
+            if (!p.matches(WINDOWS_DRIVE_REGEX))
                 p = "/$p"
             val toPath = p.toPath()
             return LocalFileSystem.getInstance().findFileByNioFile(toPath)

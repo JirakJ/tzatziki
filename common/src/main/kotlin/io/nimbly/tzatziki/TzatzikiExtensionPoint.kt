@@ -33,8 +33,10 @@ interface TzatzikiExtensionPoint {
 
 object Tzatziki {
 
-    operator fun invoke(): ExtensionPointName<TzatzikiExtensionPoint> =
+    private val EP_NAME: ExtensionPointName<TzatzikiExtensionPoint> =
         ExtensionPointName.create("io.nimbly.tzatziki.io.nimbly.tzatziki.main")
+
+    operator fun invoke(): ExtensionPointName<TzatzikiExtensionPoint> = EP_NAME
 
     fun findSteps(vfile: VirtualFile?, offset: Int?): List<GherkinStep> {
         return findStepsAndBreakpoints(vfile, offset)?.first ?: listOf()

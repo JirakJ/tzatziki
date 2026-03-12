@@ -124,7 +124,7 @@ class TzScenarioCompletion: CompletionContributor() {
 
         //
         // Adapt and add other contributor's completions
-        val allStepDescriptions = allSteps.map { it.description }
+        val allStepDescriptions = allSteps.map { it.description }.toSet()
         resultSet.runRemainingContributors(parameters) { result ->
             var lookup = result.lookupElement
             val lookupString = result.lookupElement.lookupString

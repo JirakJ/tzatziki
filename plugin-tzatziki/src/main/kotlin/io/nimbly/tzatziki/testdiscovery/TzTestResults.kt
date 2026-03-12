@@ -219,13 +219,15 @@ class TzTestResult {
 
 }
 
+private val TOOLTIP_PREFIX_REGEX = "^(\\w*\\.)*\\w*: ".toRegex()
+
 fun SMTestProxy.tooltip(): String {
     var t = this.stacktrace
     if (t.isNullOrBlank())
         return "Cucumber test failure"
 
     t = t.substringBefore("\n")
-    t = t.replaceFirst("^(\\w*\\.)*\\w*: ".toRegex(), "")
+    t = t.replaceFirst(TOOLTIP_PREFIX_REGEX, "")
     t = t.escape()
 
     return "<html>$t</html>"

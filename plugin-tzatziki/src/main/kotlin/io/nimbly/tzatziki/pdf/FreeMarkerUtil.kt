@@ -141,12 +141,14 @@ fun String?.noblank(): String? {
     return this
 }
 
+private val CONTENT_HEIGHT_REGEX = Regex("content[0-9]+")
+
 object PictureWrapper : KotlinWrapper<Picture>(
     escapeForHtml = false,
     kclass = Picture::class,
     wrapper = { it: Picture, key: String? ->
         val picture: String?
-        if (key?.matches(Regex("content[0-9]+"))!!) {
+        if (key?.matches(CONTENT_HEIGHT_REGEX)!!) {
             val height = key.substringAfter("content").toInt()
             picture = it.resized(height = height)
         } else {
@@ -164,51 +166,49 @@ class Picture(
 fun Picture.resized(width: Int? = null, height: Int? = null)
     = scaleSVG(content, height = height)
 
+private val SVG_WIDTH_PATTERN = Pattern.compile("(?s).*<svg[^>]*width\\s*=\\s*\"(\\d*)")
+private val SVG_HEIGHT_PATTERN = Pattern.compile("(?s).*<svg[^>]*height\\s*=\\s*\"(\\d*)")
+private val WIDTH_ATTR_REGEX = Regex("width\\s*=\\s*\"\\d*")
+private val HEIGHT_ATTR_REGEX = Regex("height\\s*=\\s*\"\\d*")
+private val SVG_TAG_REGEX = Regex("<svg")
+
 fun scaleSVG(image: String, width: Int? = null, height: Int? = null): String {
 
     var svgImage = image
     if (width != null) {
-        val widthPattern = Pattern.compile("(?s).*<svg[^>]*width\\s*=\\s*\"(\\d*)")
-        val widthMatcher = widthPattern.matcher(svgImage)
+        val widthMatcher = SVG_WIDTH_PATTERN.matcher(svgImage)
         if (widthMatcher.find()) {
-            val originalWidthAsString = widthMatcher.group(1)
-            val originalWidth = originalWidthAsString.toInt()
-            svgImage = svgImage.replaceFirst("width\\s*=\\s*\"\\d*".toRegex(), "width=\"$width")
+            val originalWidth = widthMatcher.group(1).toInt()
+            svgImage = svgImage.replaceFirst(WIDTH_ATTR_REGEX, "width=\"$width")
             if (height == null) {
                 // Must also scale height manually relative to width if explicit height is not set.
-                val heightPattern = Pattern.compile("(?s).*<svg[^>]*height\\s*=\\s*\"(\\d*)")
-                val heightMatcher = heightPattern.matcher(svgImage)
+                val heightMatcher = SVG_HEIGHT_PATTERN.matcher(svgImage)
                 if (heightMatcher.find()) {
-                    val originalHeightAsString = heightMatcher.group(1)
-                    val originalHeight = originalHeightAsString.toInt()
+                    val originalHeight = heightMatcher.group(1).toInt()
                     val computedScaledHeight = ((originalHeight * width).toDouble() / originalWidth.toDouble()).toInt()
-                    svgImage = svgImage.replaceFirst("height\\s*=\\s*\"\\d*".toRegex(), "height=\"$computedScaledHeight")
+                    svgImage = svgImage.replaceFirst(HEIGHT_ATTR_REGEX, "height=\"$computedScaledHeight")
                 }
             }
         } else {
-            svgImage = svgImage.replaceFirst("<svg".toRegex(), "<svg width=\"$width\"")
+            svgImage = svgImage.replaceFirst(SVG_TAG_REGEX, "<svg width=\"$width\"")
         }
     }
     if (height != null) {
-        val heightPattern = Pattern.compile("(?s).*<svg[^>]*height\\s*=\\s*\"(\\d*)")
-        val heightMatcher = heightPattern.matcher(svgImage)
+        val heightMatcher = SVG_HEIGHT_PATTERN.matcher(svgImage)
         if (heightMatcher.find()) {
-            val originalHeightAsString = heightMatcher.group(1)
-            val originalHeight = originalHeightAsString.toInt()
-            svgImage = svgImage.replaceFirst("height\\s*=\\s*\"\\d*".toRegex(), "height=\"$height")
+            val originalHeight = heightMatcher.group(1).toInt()
+            svgImage = svgImage.replaceFirst(HEIGHT_ATTR_REGEX, "height=\"$height")
             if (width == null) {
                 // Must also scale width manually relative to height if explicit width is not set.
-                val widthPattern = Pattern.compile("(?s).*<svg[^>]*width\\s*=\\s*\"(\\d*)")
-                val widthMatcher = widthPattern.matcher(svgImage)
+                val widthMatcher = SVG_WIDTH_PATTERN.matcher(svgImage)
                 if (widthMatcher.find()) {
-                    val originalWidthAsString = widthMatcher.group(1)
-                    val originalWidth = originalWidthAsString.toInt()
+                    val originalWidth = widthMatcher.group(1).toInt()
                     val computedScaledWidth = ((originalWidth * height).toDouble() / originalHeight.toDouble()).toInt()
-                    svgImage = svgImage.replaceFirst("width\\s*=\\s*\"\\d*".toRegex(), "width=\"$computedScaledWidth")
+                    svgImage = svgImage.replaceFirst(WIDTH_ATTR_REGEX, "width=\"$computedScaledWidth")
                 }
             }
         } else {
-            svgImage = svgImage.replaceFirst("<svg".toRegex(), "<svg height=\"$height\"")
+            svgImage = svgImage.replaceFirst(SVG_TAG_REGEX, "<svg height=\"$height\"")
         }
     }
     return svgImage

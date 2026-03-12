@@ -3,6 +3,12 @@ package io.nimbly.i18n.util
 import java.text.Normalizer
 import java.util.*
 
+private val SNAKE_CASE_LOWER_REGEX = "^[a-z]+(_[a-z]+)*$".toRegex()
+private val SNAKE_CASE_UPPER_REGEX = "^[A-Z]+(_[A-Z]+)*$".toRegex()
+private val NON_ALPHA_UNDERSCORE_REGEX = "[^a-zA-Z_]".toRegex()
+private val CAMEL_CASE_SPLIT_REGEX = Regex("(?<=[a-zÀ-ö])(?=[A-ZÀ-Ö])|(?<=[A-Z])(?=[A-Z][a-zÀ-ö])")
+private val DIACRITICAL_MARKS_REGEX = "\\p{InCombiningDiacriticalMarks}+".toRegex()
+
 enum class EFormat(val preserveQuotes: Boolean) {
     TEXT(false),
     HTML(false),
@@ -28,10 +34,10 @@ fun String.detectStyle(psiElementSelected: Boolean): EStyle {
         return EStyle.NORMAL
 
     if (this.contains("_")) {
-        if ("^[a-z]+(_[a-z]+)*$".toRegex().matches(this))
+        if (SNAKE_CASE_LOWER_REGEX.matches(this))
             return EStyle.SNAKE_CASE_LOWER
 
-        if ("^[A-Z]+(_[A-Z]+)*$".toRegex().matches(this))
+        if (SNAKE_CASE_UPPER_REGEX.matches(this))
             return EStyle.SNAKE_CASE_UPPER
     }
 
@@ -84,21 +90,21 @@ fun String.escapeStyle(style: EStyle, locale: Locale): String {
             EStyle.CAMEL_CASE_UPPER ->
                 this.toCamelCase(locale)
                     .removeAccents()
-                    .preserveQuotes { it.replace("[^a-zA-Z_]".toRegex(), "") }
+                    .preserveQuotes { it.replace(NON_ALPHA_UNDERSCORE_REGEX, "") }
                     .toTitleCase(locale)
             EStyle.CAMEL_CASE_LOWER ->
                 this.toCamelCase(locale)
                     .removeAccents()
-                    .preserveQuotes { it.replace("[^a-zA-Z_]".toRegex(), "") }
+                    .preserveQuotes { it.replace(NON_ALPHA_UNDERSCORE_REGEX, "") }
             EStyle.SNAKE_CASE_LOWER ->
                 this.replace(" ", "_")
                     .removeAccents()
-                    .preserveQuotes { it.replace("[^a-zA-Z_]".toRegex(), "") }
+                    .preserveQuotes { it.replace(NON_ALPHA_UNDERSCORE_REGEX, "") }
                     .lowercase(locale)
             EStyle.SNAKE_CASE_UPPER ->
                 this.replace(" ", "_")
                     .removeAccents()
-                    .preserveQuotes { it.replace("[^a-zA-Z_]".toRegex(), "") }
+                    .preserveQuotes { it.replace(NON_ALPHA_UNDERSCORE_REGEX, "") }
                     .uppercase(locale)
             EStyle.NORMAL_TITLED ->
                 this.toTitleCase(locale)
@@ -116,8 +122,7 @@ fun String.escapeStyle(style: EStyle, locale: Locale): String {
 }
 
 fun String.fromCamelCase(): String {
-    val regex = Regex("(?<=[a-zÀ-ö])(?=[A-ZÀ-Ö])|(?<=[A-Z])(?=[A-Z][a-zÀ-ö])")
-    return this.split(regex).joinToString(" ")
+    return this.split(CAMEL_CASE_SPLIT_REGEX).joinToString(" ")
 }
 
 fun String.toCamelCase(locale: Locale): String {
@@ -162,7 +167,5 @@ fun String.isTitleCase(): Boolean {
 
 fun String.removeAccents(): String {
     val normalizedString = Normalizer.normalize(this, Normalizer.Form.NFD)
-    val pattern = "\\p{InCombiningDiacriticalMarks}+".toRegex()
-
-    return pattern.replace(normalizedString, "")
+    return DIACRITICAL_MARKS_REGEX.replace(normalizedString, "")
 }
