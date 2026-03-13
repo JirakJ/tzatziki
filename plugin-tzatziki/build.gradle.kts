@@ -61,8 +61,8 @@ tasks {
     }
 
     patchPluginXml {
-        sinceBuild.set("222")    // 2021.2.4
-        // No untilBuild — compatible with all future IDE versions
+        sinceBuild.set("232")    // 2023.2
+        untilBuild.set("")       // No upper bound — compatible with all future IDE versions
 
         changeNotes.set(notes)
     }
