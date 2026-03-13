@@ -62,7 +62,7 @@ tasks {
 
     patchPluginXml {
         sinceBuild.set("222")    // 2021.2.4
-        untilBuild.set("243.*")
+        // No untilBuild — compatible with all future IDE versions
 
         changeNotes.set(notes)
     }

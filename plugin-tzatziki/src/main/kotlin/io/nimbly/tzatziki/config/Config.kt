@@ -29,6 +29,7 @@ import io.nimbly.tzatziki.pdf.ELeader
 import io.nimbly.tzatziki.pdf.ESummaryDepth
 import io.nimbly.tzatziki.pdf.PdfStyle
 import io.nimbly.tzatziki.pdf.Picture
+import io.nimbly.tzatziki.preferences.CucumberPlusOptionsConfigurable
 import io.nimbly.tzatziki.util.*
 import java.io.File
 import java.io.InputStreamReader
@@ -330,7 +331,8 @@ fun createConfiguration(
             if (v != null)
                 return v
         }
-        return ""
+        // Fallback to IDE-level settings
+        return CucumberPlusOptionsConfigurable.getIdeDefault(property) ?: ""
     }
 
     fun getBoolean(property: String): Boolean {
