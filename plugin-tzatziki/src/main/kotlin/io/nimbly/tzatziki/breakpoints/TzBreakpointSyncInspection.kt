@@ -29,7 +29,6 @@ import org.jetbrains.plugins.cucumber.inspections.GherkinInspection
 import org.jetbrains.plugins.cucumber.psi.GherkinElementVisitor
 import org.jetbrains.plugins.cucumber.psi.GherkinStep
 import org.jetbrains.plugins.cucumber.psi.GherkinTableRow
-import org.jetbrains.plugins.cucumber.steps.reference.CucumberStepReference
 
 class TzBreakpointSyncInspection : GherkinInspection() {
 
@@ -70,21 +69,23 @@ class TzBreakpointSyncInspection : GherkinInspection() {
                 val stepLine = step.getDocumentLine()
                     ?: return
 
+                val breakpointManager = XDebuggerManager.getInstance(step.project).breakpointManager
+                val allBreakpoints = breakpointManager.allBreakpoints
+                val extensions = Tzatziki().extensionList
+                if (allBreakpoints.isEmpty() && extensions.isEmpty())
+                    return
+
                 // Look for gherkin breakpoints
-                 val reference = step.references
-                    .filterIsInstance<CucumberStepReference>()
-                    .firstOrNull()
-                val gherkinBreakpoints = XDebuggerManager.getInstance(step.project)
-                    .breakpointManager
-                    .allBreakpoints
-                    .filter { it.sourcePosition?.file == step.containingFile.virtualFile }
-                    .filter { it.sourcePosition?.line == stepLine }
-                    .nullIfEmpty()
+                val reference = step.findCucumberStepReference()
+                val stepFile = step.containingFile.virtualFile
+                val hasGherkinBreakpoint = allBreakpoints.any {
+                    val pos = it.sourcePosition
+                    pos != null && pos.file == stepFile && pos.line == stepLine
+                }
 
                 // Look for code breakpoints
                 val stepDefinitions = reference?.resolveToDefinition()
                 val codeElement = stepDefinitions?.element
-                val extensions = Tzatziki().extensionList
                 val codeBreakpoints =
                     extensions.firstNotNullOfOrNull {
                     it.findStepsAndBreakpoints(
@@ -100,7 +101,7 @@ class TzBreakpointSyncInspection : GherkinInspection() {
                 }
 
                 // Compare
-                if (gherkinBreakpoints != null && codeBreakpoints == null && stepDefinitions != null) {
+                if (hasGherkinBreakpoint && codeBreakpoints == null && stepDefinitions != null) {
 
                     // Restore breakpoint since reference is lost !
                     val elt = extensions.firstNotNullOfOrNull {
@@ -109,7 +110,7 @@ class TzBreakpointSyncInspection : GherkinInspection() {
                     toggleCodeBreakpoint(elt, step.project)
 
                 }
-                else if (gherkinBreakpoints == null && codeBreakpoints != null) {
+                else if (!hasGherkinBreakpoint && codeBreakpoints != null) {
 
                     // Create missing gherkin breakpoint
                     // TODO Do it only if code step has only one reference !

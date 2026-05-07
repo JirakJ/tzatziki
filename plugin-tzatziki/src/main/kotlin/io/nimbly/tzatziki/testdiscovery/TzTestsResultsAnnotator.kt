@@ -54,6 +54,9 @@ class TzTestsResultsAnnotator : Annotator {
         if (!TOGGLE_CUCUMBER_PL)
             return
 
+        if (TzTestRegistry.results.tests.isEmpty())
+            return
+
         when (element) {
             is GherkinStep -> annotateStep(element, holder)
             is GherkinTableRowImpl -> annotateRow(element, holder)
@@ -69,7 +72,8 @@ class TzTestsResultsAnnotator : Annotator {
         val results = TzTestRegistry.results
         for (child in row.children) {
             if (child is GherkinTableCell) {
-                val tests = results[child] ?: continue
+                val tests = results[child]
+                if (tests.isEmpty()) continue
                 doAnnotateCommon(tests, child, holder)
             }
         }
