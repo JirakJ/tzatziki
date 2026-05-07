@@ -164,10 +164,13 @@ class TzFileService(val project: Project) : Disposable {
     }
 
     private fun findAllGerkinsFiles(scope: GlobalSearchScope, project: Project): Set<GherkinFile> {
-        return FilenameIndex
-            .getAllFilesByExt(project, GherkinFileType.INSTANCE.defaultExtension, scope)
-            .mapNotNull { vfile -> vfile.getFile(project) as? GherkinFile }
-            .toSet()
+        val files = LinkedHashSet<GherkinFile>()
+        for (vfile in FilenameIndex.getAllFilesByExt(project, GherkinFileType.INSTANCE.defaultExtension, scope)) {
+            val file = vfile.getFile(project) as? GherkinFile
+                ?: continue
+            files.add(file)
+        }
+        return files
     }
 
 }
@@ -308,29 +311,29 @@ private val CacheTagsKey: Key<CachedValue<List<GherkinTag>>> = Key.create("io.ni
 
 private fun findAllTags(project: Project, scope: GlobalSearchScope): SortedMap<String, Tag> {
     val allTags = mutableMapOf<String, Tag>()
-    FilenameIndex
-        .getAllFilesByExt(project, GherkinFileType.INSTANCE.defaultExtension, scope)
-        .map { vfile -> vfile.getFile(project) }
-        .filterIsInstance<GherkinFile>()
-        .forEach { file ->
-            val tags = CachedValuesManager.getCachedValue(file, CacheTagsKey) {
-
-                val tags: List<GherkinTag> = PsiTreeUtil.findChildrenOfType(file, GherkinTag::class.java)
-                    .filter { it.name.isNotEmpty() }
-
-                CachedValueProvider.Result.create(
-                    tags,
-                    PsiModificationTracker.MODIFICATION_COUNT, file
-                )
+    for (vfile in FilenameIndex.getAllFilesByExt(project, GherkinFileType.INSTANCE.defaultExtension, scope)) {
+        val file = vfile.getFile(project) as? GherkinFile
+            ?: continue
+        val tags = CachedValuesManager.getCachedValue(file, CacheTagsKey) {
+            val tags = ArrayList<GherkinTag>()
+            for (tag in PsiTreeUtil.findChildrenOfType(file, GherkinTag::class.java)) {
+                if (tag.name.isNotEmpty())
+                    tags.add(tag)
             }
 
-            tags.forEach { gtag: GherkinTag ->
-                val name = gtag.name.substringAfter("@")
-                val tag = allTags.getOrPut(name) { Tag(gtag) }
-                tag._tags.add(gtag)
-                tag._files.add(gtag.containingFile as GherkinFile)
-            }
+            CachedValueProvider.Result.create(
+                tags,
+                PsiModificationTracker.MODIFICATION_COUNT, file
+            )
         }
+
+        for (gtag in tags) {
+            val name = gtag.name.substringAfter("@")
+            val tag = allTags.getOrPut(name) { Tag(gtag) }
+            tag._tags.add(gtag)
+            tag._files.add(gtag.containingFile as GherkinFile)
+        }
+    }
     return allTags.toSortedMap(TagComparator)
 }
 

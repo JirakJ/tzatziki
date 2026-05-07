@@ -46,19 +46,22 @@ object TzTestRegistry {
         val temp = activeResults.clone()
 
         // Get involved scenario
-        val involvedScenarios = results.tests.mapNotNull { it.value.scenario }.toSet()
+        val involvedScenarios = HashSet<GherkinStepsHolder>()
+        for (item in results.tests.values) {
+            val scenario = item.scenario
+                ?: continue
+            involvedScenarios.add(scenario)
+        }
 
         // Retain all related to not-involved scenarios
-        temp.tests = temp.tests
-            .filter { !involvedScenarios.contains(it.value.scenario) }
-            .toMutableMap()
+        temp.tests.entries.removeIf { involvedScenarios.contains(it.value.scenario) }
 
         // Add new results
         temp.putAll(results)
 
         // Add highlights
-        temp.tests.forEach { (element, test) ->
-            highlighters += highlight(element, results[element])
+        results.tests.forEach { (element, _) ->
+            highlighters += highlight(element, temp[element])
         }
 
         this.activeResults = temp
@@ -77,41 +80,29 @@ object TzTestRegistry {
         if (editors.isEmpty())
             return highlights
 
-        val what = if (element is GherkinTableCell) "step" else "example"
         val textKey: TextAttributesKey
-        val tooltip: String
-        val stacktrace: String?
         if (tests.size == 1) {
 
             // Simple step or a cell
             val test = tests.first()
             textKey = test.textAttribut
-            tooltip = when {
-                test.isIgnored -> "The $what <u>could not be executed</u>"
-                test.isDefect -> test.tooltip()
-                else -> "The $what was <u>successful</u>"
-            }
-            stacktrace = test.stacktrace
         }
         else {
 
             // Step having examples
-            val ignored = tests.count { it.isIgnored }
-            val ko = tests.count { it.isDefect && !it.isIgnored }
-            val ok = tests.size - ignored - ko
+            var hasIgnored = false
+            var hasKo = false
+            for (test in tests) {
+                if (test.isIgnored)
+                    hasIgnored = true
+                else if (test.isDefect)
+                    hasKo = true
+            }
             textKey = when {
-                ignored == 0 && ko == 0 -> TEST_OK
-                ko > 0 -> TEST_KO
+                !hasIgnored && !hasKo -> TEST_OK
+                hasKo -> TEST_KO
                 else -> TEST_IGNORED
             }
-            tooltip =
-                if (textKey == TEST_OK)
-                    "The ${what}${if (tests.size>1) "s" else ""} were all ${tests.size} <u>successful</u>"
-                else
-                    "$ko ${what}${if (ko>1) "s" else ""} with <u>failure</u>,<br/>" +
-                            "$ignored ${what}${if (ignored>1) "s" else ""} <u>not executed</u>,<br/>" +
-                            "$ok ${what}${if (ok>1) "s" else ""} <u>successful</u>"
-            stacktrace = tests.firstOrNull() { it.stacktrace!=null }?.stacktrace
         }
 
         // Add annotation
@@ -148,9 +139,7 @@ object TzTestRegistry {
         val scenario = PsiTreeUtil.getContextOfType(element, GherkinStepsHolder::class.java) ?: return
 
         // Retain all related to not-involved scenarios
-        activeResults.tests = activeResults.tests
-            .filter { scenario != it.value.scenario }
-            .toMutableMap()
+        activeResults.tests.entries.removeIf { scenario == it.value.scenario }
 
     }
 
@@ -162,9 +151,7 @@ object TzTestRegistry {
             return
 
         // Retain all related to not-involved scenarios
-        activeResults.tests = activeResults.tests
-            .filter { file != it.value.scenario?.containingFile }
-            .toMutableMap()
+        activeResults.tests.entries.removeIf { file == it.value.scenario?.containingFile }
 
     }
 
@@ -208,10 +195,10 @@ class TzTestResult {
     }
 
     fun clone(): TzTestResult {
-        val tests = this.tests
-            .mapValues { (key, value) -> TzTestItem(key, value.scenario, value.tests.toMutableSet()) }
         val r = TzTestResult()
-        r.tests.putAll(tests)
+        for ((key, value) in tests) {
+            r.tests[key] = TzTestItem(key, value.scenario, value.tests.toMutableSet())
+        }
         return r
     }
 
