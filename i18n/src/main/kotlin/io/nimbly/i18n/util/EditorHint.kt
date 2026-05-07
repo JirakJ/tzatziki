@@ -1,11 +1,13 @@
 package io.nimbly.i18n.util
 
 import com.intellij.codeInsight.daemon.impl.HintRenderer
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.Inlay
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.psi.PsiElement
 import com.intellij.psi.SmartPsiElementPointer
+import com.intellij.psi.util.PsiModificationTracker
 import com.intellij.ui.JBColor
 import io.nimbly.i18n.TranslationPlusSettings
 import io.nimbly.i18n.translation.TranslationManager
@@ -33,6 +35,17 @@ class EditorHint(
 
     private val creationDate = LocalDateTime.now()
     private var focus: Boolean = false
+    private var cachedUsagesStamp = -1L
+    private var cachedUsages: Set<Pair<PsiElement, Int>> = emptySet()
+
+    fun getUsages(origin: PsiElement, editor: Editor): Set<Pair<PsiElement, Int>> {
+        val stamp = PsiModificationTracker.getInstance(origin.project).modificationCount
+        if (stamp != cachedUsagesStamp) {
+            cachedUsages = findUsages(origin, editor)
+            cachedUsagesStamp = stamp
+        }
+        return cachedUsages
+    }
 
     override fun paint(inlay: Inlay<*>, g: Graphics, r: Rectangle, attributes: TextAttributes) {
 

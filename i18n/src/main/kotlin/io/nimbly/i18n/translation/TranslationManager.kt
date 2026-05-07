@@ -16,7 +16,7 @@ import javax.swing.SwingUtilities
 object TranslationManager {
 
     private val listeners: MutableList<TranslationListener> = mutableListOf()
-    private var findUsages: Set<Pair<PsiElement, Int>>? = null
+    private var usageElements: Set<PsiElement> = emptySet()
 
     fun registerListener(listener: TranslationListener) {
         listeners.add(listener)
@@ -67,15 +67,15 @@ object TranslationManager {
         }
 
         if (origin?.element != null && origin.editor != null) {
-            findUsages = null
+            setUsages(null)
             updateListenersAfterUsagesCollected(origin.element, project)
             SwingUtilities.invokeLater {
-                findUsages = findUsages(origin.element, origin.editor)
+                setUsages(findUsages(origin.element, origin.editor))
                 updateListenersAfterUsagesCollected(origin.element, project)
             }
         }
         else {
-            findUsages = null
+            setUsages(null)
             updateListenersAfterUsagesCollected(origin?.element, project)
         }
 
@@ -107,7 +107,11 @@ object TranslationManager {
     }
 
     fun getUsages(): Set<PsiElement> {
-        return findUsages?.map { it.first }?.toSet() ?: emptySet()
+        return usageElements
+    }
+
+    private fun setUsages(usages: Set<Pair<PsiElement, Int>>?) {
+        usageElements = usages?.mapTo(LinkedHashSet()) { it.first } ?: emptySet()
     }
 
     fun changeEngine(engine: EEngine) {
