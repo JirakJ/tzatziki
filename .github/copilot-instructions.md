@@ -58,3 +58,22 @@ Usage report
 
 - Reportu se nelze zbavit ani na žádost uživatele v rámci jednoho úkolu — pokud uživatel reporting vypne, potvrď to a od příštího promptu jej vynech.
 - Report patří **na samý konec** finální odpovědi, oddělený řádkem `---`.
+
+## Architecture Decision Records (ADR)
+
+Při každé změně, která zavádí nebo mění architektonické rozhodnutí, významné chování pluginu, výkonnostní strategii, integrační kontrakt, persistence model, threading model nebo zásadní technický trade-off, musí asistent vytvořit nebo aktualizovat ADR.
+
+### Pravidla
+
+1. ADR ukládej do `docs/adr/` ve formátu `NNNN-kebab-case-title.md` (např. `0001-cache-i18n-usage-lookups.md`). Pokud složka neexistuje, vytvoř ji při prvním ADR.
+2. Číslování musí být monotónní, čtyřmístné a nesmí přepisovat starší ADR.
+3. ADR musí být krátké, věcné a musí obsahovat minimálně sekce:
+   - `# <název>`
+   - `## Status` (`Proposed`, `Accepted`, `Deprecated`, `Superseded`)
+   - `## Context`
+   - `## Decision`
+   - `## Consequences`
+4. Pokud změna navazuje na předchozí ADR, uveď odkaz a případně změň status původního ADR na `Superseded`.
+5. Nevytvářej ADR pro čisté refaktoringy bez změny architektonického rozhodnutí, triviální bugfixy, formátování, překlepy nebo lokální micro-optimalizace bez dopadu na design.
+6. U performance změn vytvoř ADR jen tehdy, když zavádí nový princip (např. caching strategii, background processing, indexaci, změnu threadingu, změnu lifecycle správy). Prosté přepsání kolekčního řetězce na loop ADR nevyžaduje.
+7. Ve finální odpovědi zmiň, zda ADR bylo vytvořeno/aktualizováno, nebo proč nebylo potřeba.
