@@ -38,6 +38,7 @@ import org.jetbrains.plugins.cucumber.psi.GherkinFile
 import org.jetbrains.plugins.cucumber.psi.GherkinFileType
 import org.jetbrains.plugins.cucumber.psi.GherkinStep
 import org.jetbrains.plugins.cucumber.steps.AbstractStepDefinition
+import java.util.TreeSet
 
 class TzScenarioCompletion: CompletionContributor() {
 
@@ -58,37 +59,47 @@ class TzScenarioCompletion: CompletionContributor() {
         val tzService = project.getService(TzFileService::class.java)
 
         val allSteps = mutableSetOf<Step>()
-        FilenameIndex
-            .getAllFilesByExt(project, GherkinFileType.INSTANCE.defaultExtension, module.getGherkinScope())
-            .map { vfile -> vfile.getFile(project) }
-            .filterIsInstance<GherkinFile>()
-            .filter { it.checkExpression(tzService.getTagsFilter()) }
-            .forEach { file ->
-                val steps = CachedValuesManager.getCachedValue(file, CacheKey) {
+        for (vfile in FilenameIndex.getAllFilesByExt(project, GherkinFileType.INSTANCE.defaultExtension, module.getGherkinScope())) {
+            val file = vfile.getFile(project) as? GherkinFile
+                ?: continue
+            if (!file.checkExpression(tzService.getTagsFilter()))
+                continue
 
-                    val steps = file.features
-                        .flatMap { feature -> feature.scenarios.asSequence() }
-                        .flatMap { scenario -> scenario.steps.asSequence() }
-                        .map { Step(it) }
-                        .filter { it.description.isNotEmpty() }
-
-                    CachedValueProvider.Result.create(
-                        steps,
-                        PsiModificationTracker.MODIFICATION_COUNT, file
-                    )
+            val steps = CachedValuesManager.getCachedValue(file, CacheKey) {
+                val steps = ArrayList<Step>()
+                for (feature in file.features) {
+                    for (scenario in feature.scenarios) {
+                        for (gherkinStep in scenario.steps) {
+                            val item = Step(gherkinStep)
+                            if (item.description.isNotEmpty())
+                                steps.add(item)
+                        }
+                    }
                 }
-                allSteps.addAll(steps)
+
+                CachedValueProvider.Result.create(
+                    steps,
+                    PsiModificationTracker.MODIFICATION_COUNT, file
+                )
             }
+            allSteps.addAll(steps)
+        }
 
         val description = step.description.safeText.trim()
         val filename = step.containingFile.name
+        val stepsByDescription = LinkedHashMap<String, MutableList<Step>>()
+        val allStepDescriptions = HashSet<String>()
+        for (item in allSteps) {
+            val stepDescription = item.description
+            allStepDescriptions.add(stepDescription)
+            if (stepDescription != description) {
+                stepsByDescription.getOrPut(stepDescription) { ArrayList() }.add(item)
+            }
+        }
 
         //
         // Add completions
-        allSteps
-            .filter { it.description != description}
-            .groupBy { it.description }
-            .forEach { (stepDescription, items) ->
+        stepsByDescription.forEach { (stepDescription, items) ->
 
                 val otherStep = items.find { it.step != step }?.step
                 val lookup = LookupElementBuilder.create(stepDescription)
@@ -108,11 +119,13 @@ class TzScenarioCompletion: CompletionContributor() {
                             val deprecated = items.firstOrNull { it.deprecated }?.deprecated ?: false
                             presentation.isStrikeout = deprecated
 
-                            val tags = items
-                                .flatMap { it.step.allTags }
-                                .map { it.name }
-                                .toSortedSet()
-                                .joinToString(separator = " ", prefix = "  ")
+                            val tagNames = TreeSet<String>()
+                            for (item in items) {
+                                for (tag in item.step.allTags) {
+                                    tagNames.add(tag.name)
+                                }
+                            }
+                            val tags = tagNames.joinToString(separator = " ", prefix = "  ")
 
                             presentation.setTailText(tags, true)
                         }
@@ -123,7 +136,6 @@ class TzScenarioCompletion: CompletionContributor() {
 
         //
         // Adapt and add other contributor's completions
-        val allStepDescriptions = allSteps.mapTo(HashSet()) { it.description }
         resultSet.runRemainingContributors(parameters) { result ->
             var lookup = result.lookupElement
             val lookupString = result.lookupElement.lookupString

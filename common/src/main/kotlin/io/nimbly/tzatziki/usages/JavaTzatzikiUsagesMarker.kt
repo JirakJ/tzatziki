@@ -40,27 +40,24 @@ abstract class TzStepsUsagesMarker : LineMarkerProvider {
         annotationText: String,
         result: MutableCollection<in LineMarkerInfo<*>>
     ) {
-        // Group usages by regex
-        val groupedByRegex: Map<String, List<GherkinStep>> = usages.asSequence()
-            .map { it.element }
-            .filterIsInstance<GherkinStep>()
-            .flatMap { step ->
-                step.findDefinitions()
-                    .asSequence()
-                    .mapNotNull { it.expression }
-                    .map { it to step }
+        val targets = ArrayList<GherkinStepsHolder>()
+        for (usage in usages) {
+            val step = usage.element as? GherkinStep
+                ?: continue
+            for (definition in step.findDefinitions()) {
+                if (definition.expression == annotationText) {
+                    targets.add(step.stepHolder)
+                    break
+                }
             }
-            .groupBy { it.first }
-            .mapValues { entry -> entry.value.map { it.second } }
-
-        // Find annotation usages
-        val steps = groupedByRegex[annotationText]
-            ?: return
+        }
+        if (targets.isEmpty())
+            return
 
         // Add marker
         result.add(buildMarker(
             element = token,
-            targets = steps.map { it.stepHolder }))
+            targets = targets))
     }
 
     protected fun buildMarker(element: PsiElement, targets: List<GherkinStepsHolder>) : RelatedItemLineMarkerInfo<PsiElement> {
