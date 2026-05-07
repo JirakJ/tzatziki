@@ -290,6 +290,7 @@ open class TranslateAction : DumbAwareAction()  {
             disableSoftWrapping(false)
         }
         inlayModel.addInlineElement<HintRenderer>(startOffset, p, renderer)
+        editor.markEditorHintsPresent()
         if (inputOnly)
             return
 
@@ -329,6 +330,7 @@ open class TranslateAction : DumbAwareAction()  {
                 inlayModel.addBlockElement<HintRenderer>(startOffset, ip, ren)
             }
 
+        editor.markEditorHintsPresent()
         DaemonCodeAnalyzer.getInstance(editor.project).restart()
     }
 

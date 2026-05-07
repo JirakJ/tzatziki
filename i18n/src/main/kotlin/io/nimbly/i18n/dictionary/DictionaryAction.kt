@@ -170,6 +170,7 @@ open class DictionaryAction : AnAction() , DumbAware {
             disableSoftWrapping(false)
         }
         inlayModel.addInlineElement<HintRenderer>(startOffset, p, renderer)
+        editor.markEditorHintsPresent()
     }
 
     override fun isDumbAware() = true

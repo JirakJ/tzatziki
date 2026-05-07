@@ -6,6 +6,7 @@ import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.navigation.GotoRelatedItem
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.pom.Navigatable
@@ -30,10 +31,23 @@ class TranslationAnnotator : Annotator {
         val editor = EditorFactory.getInstance().getEditors(document, element.project).firstOrNull()
             ?: return
 
-        val hint = editor.inlayModel.getBlockElementsInRange(element.startOffset, element.endOffset)
-            .map { it.renderer }
-            .filterIsInstance<EditorHint>()
-            .firstOrNull { it.element?.element == element }
+        if (!editor.mayHaveEditorHints())
+            return
+
+        ProgressManager.checkCanceled()
+
+        val startOffset = element.startOffset
+        val endOffset = element.endOffset
+        var hint: EditorHint? = null
+        for (inlay in editor.inlayModel.getBlockElementsInRange(startOffset, endOffset)) {
+            val renderer = inlay.renderer as? EditorHint
+                ?: continue
+            if (renderer.element?.element == element) {
+                hint = renderer
+                break
+            }
+        }
+        hint
             ?: return
 
         // val inlay = editor.inlayModel.getBlockElementsInRange(element.startOffset, element.endOffset)

@@ -105,6 +105,7 @@ class Context {
             toReplace.forEach {
                 e.editor.inlayModel.addBlockElement<HintRenderer>(it.offset, ip, it.renderer)
             }
+            e.editor.markEditorHintsPresent()
         }
 
         override fun mousePressed(e: EditorMouseEvent) {

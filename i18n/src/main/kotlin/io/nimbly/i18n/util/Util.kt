@@ -28,6 +28,7 @@ import com.intellij.openapi.editor.*
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
+import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.LeafPsiElement
@@ -164,19 +165,38 @@ fun EditorFactory.clearInlays(project: Project?, delay: Int = -1) {
 fun Editor.clearInlays(delay: Int = -1): Int {
     val inlays = getTranslationInlays(delay)
     inlays.forEach { Disposer.dispose(it) }
+    putUserData(EDITOR_HINTS_PRESENT_KEY, getTranslationInlays().isNotEmpty())
     return inlays.size
 }
 
+private val EDITOR_HINTS_PRESENT_KEY = Key.create<Boolean>("io.nimbly.i18n.editorHintsPresent")
+
+fun Editor.markEditorHintsPresent() {
+    putUserData(EDITOR_HINTS_PRESENT_KEY, true)
+}
+
+fun Editor.mayHaveEditorHints(): Boolean =
+    getUserData(EDITOR_HINTS_PRESENT_KEY) == true
+
 fun Editor.getTranslationInlays(delay: Int = -1): List<Inlay<EditorHint>> {
-    val inlays = (inlayModel.getBlockElementsInRange(0, document.textLength)
-        .filter { it.renderer is EditorHint }
-        .filter { delay < 0 || (it.renderer as EditorHint).sinceSeconds() > 5 }
-        +
-        inlayModel.getInlineElementsInRange(0, document.textLength)
-            .filter { it.renderer is EditorHint }
-            .filter { delay < 0 || (it.renderer as EditorHint).sinceSeconds() > 5 })
-        @Suppress("UNCHECKED_CAST")
-        return inlays as List<Inlay<EditorHint>>
+    val inlays = ArrayList<Inlay<EditorHint>>()
+    for (inlay in inlayModel.getBlockElementsInRange(0, document.textLength)) {
+        val renderer = inlay.renderer as? EditorHint
+            ?: continue
+        if (delay < 0 || renderer.sinceSeconds() > 5) {
+            @Suppress("UNCHECKED_CAST")
+            inlays.add(inlay as Inlay<EditorHint>)
+        }
+    }
+    for (inlay in inlayModel.getInlineElementsInRange(0, document.textLength)) {
+        val renderer = inlay.renderer as? EditorHint
+            ?: continue
+        if (delay < 0 || renderer.sinceSeconds() > 5) {
+            @Suppress("UNCHECKED_CAST")
+            inlays.add(inlay as Inlay<EditorHint>)
+        }
+    }
+    return inlays
 }
 
 fun playAudio(audioUrl: URL) {
@@ -264,4 +284,3 @@ fun String.trimIfExceedsLimit(maxLength: Int): String {
     }
     return this
 }
-
