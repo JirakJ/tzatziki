@@ -33,11 +33,14 @@ import org.jetbrains.plugins.cucumber.psi.GherkinFileType
 class TzTypedHandler : TypedHandlerDelegate() {
 
     override fun charTyped(charTyped: Char, project: Project, editor: Editor, file: PsiFile): Result {
-        if (file.gherkin && editor.document.getTextLine(editor.caretModel.offset).contains("|"))
-            editor.findTableAt(editor.caretModel.offset)?.format()
+        if (!file.gherkin)
+            return CONTINUE
 
-        if (file.gherkin)
-            TzTestRegistry.cleanTestsResults(file, editor)
+        val offset = editor.caretModel.offset
+        if (editor.document.getTextLine(offset).contains("|"))
+            editor.findTableAt(offset)?.format()
+
+        TzTestRegistry.cleanTestsResults(file, editor)
 
         return CONTINUE
     }

@@ -32,14 +32,26 @@ class ModuleNode(
 
     override fun getChildren(): List<AbstractTzNode<out UserDataHolder>> {
 
-        val subModules = value.subModules
-            .map {  ModuleNode(it, it.simpleName, exp) }
+        val subModules = ArrayList<ModuleNode>()
+        for (sub in value.subModules) {
+            subModules.add(ModuleNode(sub, sub.simpleName, exp))
+        }
+        subModules.sortBy { it.name }
 
-        val subFiles = findAllGerkinsFiles(value)
-            .filter { it.checkExpression(filterByTags) }
-            .map { GherkinFileNode(project, it, filterByTags) }
+        val subFiles = ArrayList<GherkinFileNode>()
+        for (file in findAllGerkinsFiles(value)) {
+            if (!file.checkExpression(filterByTags)) continue
+            subFiles.add(GherkinFileNode(project, file, filterByTags))
+        }
+        subFiles.sortBy { it.name }
 
-        return subModules.sortedBy { it.name } + subFiles.sortedBy { it.name }
+        if (subFiles.isEmpty()) return subModules
+        if (subModules.isEmpty()) return subFiles
+
+        val result = ArrayList<AbstractTzNode<out UserDataHolder>>(subModules.size + subFiles.size)
+        result.addAll(subModules)
+        result.addAll(subFiles)
+        return result
     }
 
     override fun isAlwaysExpand() = true
@@ -58,7 +70,7 @@ class ModuleNode(
         val dataContext = SimpleDataContext.builder()
         dataContext.add(CommonDataKeys.PROJECT, project)
 
-        val file = children.filterIsInstance<GherkinFileNode>().firstOrNull()?.file
+        val file = children.firstNotNullOfOrNull { (it as? GherkinFileNode)?.file }
             ?: return emptyConfigurationContext()
 
         val fileModule = file.getModule()

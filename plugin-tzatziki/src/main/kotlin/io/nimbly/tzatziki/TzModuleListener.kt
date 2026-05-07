@@ -81,10 +81,11 @@ class TzPostStartup : StartupActivity {
 
     private class DeletionHandler(actionId: String) : AbstractWriteActionHandler(actionId) {
         override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext) {
-            if (dataContext.gherkin && editor.stopBeforeDeletion(getActionId()))
+            val gherkin = dataContext.gherkin
+            if (gherkin && editor.stopBeforeDeletion(getActionId()))
                 return
             doDefault(editor, caret, dataContext)
-            if (dataContext.gherkin)
+            if (gherkin)
                 editor.findTableAt(editor.caretModel.offset)?.format()
         }
     }
@@ -98,9 +99,10 @@ class TzPostStartup : StartupActivity {
 
     private class EnterHandler : AbstractWriteActionHandler(ACTION_EDITOR_ENTER) {
         override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext) {
-            if (dataContext.gherkin && editor.navigateInTableWithEnter())
+            val gherkin = dataContext.gherkin
+            if (gherkin && editor.navigateInTableWithEnter())
                 return
-            if (dataContext.gherkin && editor.addTableRow())
+            if (gherkin && editor.addTableRow())
                 return
             doDefault(editor, caret, dataContext)
         }
@@ -118,11 +120,12 @@ class TzPostStartup : StartupActivity {
     private class CutHandler : AbstractWriteActionHandler(ACTION_EDITOR_CUT) {
         override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext) {
 
-            if (dataContext.gherkin && editor.smartCut())
+            val gherkin = dataContext.gherkin
+            if (gherkin && editor.smartCut())
                 return
 
             doDefault(editor, null, dataContext)
-            if (dataContext.gherkin) {
+            if (gherkin) {
                 val table = editor.findTableAt(editor.caretModel.offset)
                 if (table != null) {
                     table.format()
@@ -141,7 +144,8 @@ class TzPostStartup : StartupActivity {
             }
 
             val offset = editor.caretModel.offset
-            if (dataContext.gherkin && editor.smartPaste(dataContext))
+            val gherkin = dataContext.gherkin
+            if (gherkin && editor.smartPaste(dataContext))
                 return
 
             blockSelectionSwitch()
@@ -151,7 +155,7 @@ class TzPostStartup : StartupActivity {
                 releaseSelectionSwitch()
             }
 
-            if (dataContext.gherkin && editor.caretModel.caretCount > 1) {
+            if (gherkin && editor.caretModel.caretCount > 1) {
 
                 PsiDocumentManager.getInstance(editor.project!!).commitDocument(editor.document)
 
