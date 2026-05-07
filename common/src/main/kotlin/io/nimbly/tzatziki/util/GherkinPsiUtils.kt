@@ -142,8 +142,12 @@ fun PsiElement.isDeprecated(): Boolean {
     return Tzatziki().extensionList.any { it.isDeprecated(this) }
 }
 
-fun GherkinStep.findCucumberStepReference(): CucumberStepReference?
-    = findCucumberStepReferences().firstOrNull()
+fun GherkinStep.findCucumberStepReference(): CucumberStepReference? {
+    for (ref in references) {
+        if (ref is CucumberStepReference) return ref
+    }
+    return null
+}
 
 fun GherkinStep.findCucumberStepReferences(): List<CucumberStepReference>
     = references.filterIsInstance<CucumberStepReference>()
