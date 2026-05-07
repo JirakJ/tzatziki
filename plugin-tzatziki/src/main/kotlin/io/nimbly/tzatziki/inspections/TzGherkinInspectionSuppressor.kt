@@ -13,6 +13,10 @@ class TzGherkinInspectionSuppressor : InspectionSuppressor {
     }
 
     override fun getSuppressActions(element: PsiElement?, toolId: String): Array<SuppressQuickFix> {
-        return arrayOf()
+        return EMPTY_FIXES
+    }
+
+    companion object {
+        private val EMPTY_FIXES = emptyArray<SuppressQuickFix>()
     }
 }

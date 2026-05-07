@@ -54,12 +54,13 @@ val PsiElement.description: String
 
 val PsiElement.descriptionRange: TextRange
     get() {
-        val indexOfFirst = this.text.indexOfFirst { it == ' ' }
-        if (indexOfFirst <0)
+        val text = this.text
+        val indexOfFirst = text.indexOfFirst { it == ' ' }
+        if (indexOfFirst < 0)
             return TextRange.EMPTY_RANGE
         var start = indexOfFirst + 1
-        start += this.text.substring(start).indexOfFirst { it != ' ' }
-        val eol = this.text.indexOfFirst { it == '\n' }
+        start += text.substring(start).indexOfFirst { it != ' ' }
+        val eol = text.indexOfFirst { it == '\n' }
         return TextRange(
             start,
             if (eol > 0) eol else this.textLength
