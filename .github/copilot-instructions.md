@@ -11,7 +11,7 @@ Usage report
 - Input tokens: <x>
 - Cached input tokens: <y>
 - Output tokens: <z>
-- Cena: <částka> USD (≈ <částka> CZK)
+- Cena: <částka> USD (≈ <částka> EUR)
 ```
 
 ### Pravidla pro výpočet
@@ -25,7 +25,7 @@ Usage report
    - `cache read` cena za cache hit (typicky 10 % input ceny u Anthropic),
    - `output` cena za výstupní tokeny.
    - Vzorec: `cena = x/1e6 * input_rate + y/1e6 * cache_read_rate + z/1e6 * output_rate`.
-   - Připoj orientační přepočet do CZK kurzem ~23 CZK/USD (uveď, že jde o orientační kurz).
+   - Připoj orientační přepočet do EUR kurzem ~0.92 EUR/USD (uveď, že jde o orientační kurz).
 6. **Sekvence promptů** – pokud uživatel pošle více navazujících promptů v jedné konverzaci, kumuluj hodnoty od začátku konverzace a v každé doručené odpovědi vypiš aktualizovaný součet (a volitelně i delta vůči předchozímu kroku).
 7. **Dostupnost dat** – pokud asistent nemá v daném prostředí přístup k přesným hodnotám usage (běžný stav v Copilot CLI), uveď nejlepší kvalifikovaný odhad na základě délky promptů, výstupu a typických režijních nákladů, a explicitně označ hodnoty jako `odhad`.
 
@@ -38,7 +38,7 @@ Usage report
 - Input tokens: 12 480 (odhad)
 - Cached input tokens: 8 200 (odhad)
 - Output tokens: 1 350 (odhad)
-- Cena: 0.2649 USD ≈ 6.09 CZK (orientační, kurz 23 CZK/USD)
+- Cena: 0.2649 USD ≈ 0.2437 EUR (orientační, kurz 0.92 EUR/USD)
 ```
 
 ### Aktuální orientační ceník (per 1M tokenů, USD)
