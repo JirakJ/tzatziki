@@ -18,6 +18,7 @@ package io.nimbly.tzatziki.markdown
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import io.nimbly.tzatziki.TOGGLE_CUCUMBER_PL
@@ -44,11 +45,15 @@ class   TzMarkdownAnnotator : Annotator {
         // Concatenate text
         val text = element.text
 
+        // Early exit: header has no markdown markers at all → nothing to annotate.
+        if ('*' !in text) return
+
         //
         // BOLD
         val bolds = HashMap<Int, Int>(16)
         var matcher = BOLD_PATTERN.matcher(text)
         while (matcher.find()) {
+            ProgressManager.checkCanceled()
             val from = element.textOffset + matcher.start(1)
             val to = element.textOffset + matcher.end(1)
             val r = TextRange(from, to)
@@ -62,6 +67,7 @@ class   TzMarkdownAnnotator : Annotator {
         val bullets = HashSet<Int>()
         matcher = STAR_START_PATTERN.matcher(text)
         while (matcher.find()) {
+            ProgressManager.checkCanceled()
             val group = matcher.group(1)
             if (group.startsWith("**")) continue
             if (group.endsWith("*") && countMatches(group, "*") % 2 == 0) continue
@@ -69,12 +75,11 @@ class   TzMarkdownAnnotator : Annotator {
         }
 
         //
-        // ITALIC — early exit if no asterisks
-        if ('*' !in text) return
-
+        // ITALIC
         var i = 0
         var star = -1
         while (i < text.length) {
+            if ((i and 0xFFF) == 0) ProgressManager.checkCanceled()
             if (i in bullets) {
                 star = -1
                 i++

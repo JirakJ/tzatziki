@@ -163,6 +163,7 @@ class TzGherkinAnnotatorVisitor(private val myHolder: AnnotationHolder) : Gherki
         private fun hasStepsBefore(element: PsiElement): Boolean {
             var el: PsiElement? = element.prevSibling
             while (el != null && el !is GherkinStep) {
+                ProgressManager.checkCanceled()
                 el = el.prevSibling
             }
             return el != null
