@@ -56,13 +56,20 @@ class TzCellCompletion: CompletionContributor() {
     private fun completeHeader(cell: GherkinTableCell, tables: List<GherkinTable>, resultSet: CompletionResultSet) {
 
         // Find all values
-        @Suppress("UNCHECKED_CAST")
-        val values: Set<String> = tables
-            .mapNotNull { it.headerRow }
-            .flatMap { it.psiCells as List<GherkinTableCell> }
-            .filter { it != cell }
-            .map { it.text.trim() }
-            .filterTo(mutableSetOf()) { it.isNotBlank() }
+        val values = LinkedHashSet<String>()
+        for (table in tables) {
+            val header = table.headerRow
+                ?: continue
+            @Suppress("UNCHECKED_CAST")
+            val headerCells = header.psiCells as List<GherkinTableCell>
+            for (headerCell in headerCells) {
+                if (headerCell == cell)
+                    continue
+                val value = headerCell.text.trim()
+                if (value.isNotBlank())
+                    values.add(value)
+            }
+        }
 
         // Create a new cell to chain completion
         var suffix = ""

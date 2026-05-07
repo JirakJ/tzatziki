@@ -36,6 +36,7 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.refactoring.RefactoringFactory
 import com.intellij.refactoring.RefactoringUiService
 import com.intellij.refactoring.rename.RenamePsiElementProcessor
@@ -101,9 +102,13 @@ class TranslateView : SimpleToolWindowPanel(true, false), TranslationListener {
 
             if (usages != null) {
                 count = usages.size
-                fileCount = usages.distinctBy { it.containingFile }.size
+                val files = LinkedHashSet<PsiFile>()
+                for (usage in usages) {
+                    files.add(usage.containingFile)
+                }
+                fileCount = files.size
 
-                val f = usages.distinctBy { it.containingFile }.singleOrNull()?.containingFile
+                val f = if (files.size == 1) files.first() else null
                 singleFileName =
                     when (f) {
                         null -> null
@@ -748,4 +753,3 @@ private class TextArea : JBTextArea(15, 10) {
         font = JBFont.create(JBUI.Fonts.label().deriveFont(12))
     }
 }
-

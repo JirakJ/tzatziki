@@ -43,28 +43,28 @@ class TzTagCompletion: CompletionContributor() {
         // Add completions
         val description = origin.name.safeText.trim().substringAfter("@")
         val filename = origin.containingFile.name
-        allTags
-            .filter {it.key != description}
-                .forEach { (tagDescription, tag) ->
+        for ((tagDescription, tag) in allTags) {
+            if (tagDescription == description)
+                continue
 
-                val other = tag.gtags.find { it.containingFile != origin }
-                val lookup = LookupElementBuilder.create(tagDescription)
-                    .withPsiElement(other?.navigationElement)
-                    .withExpensiveRenderer(object : LookupElementRenderer<LookupElement>() {
-                        override fun renderElement(element: LookupElement, presentation: LookupElementPresentation) {
+            val other = tag.gtags.find { it.containingFile != origin }
+            val lookup = LookupElementBuilder.create(tagDescription)
+                .withPsiElement(other?.navigationElement)
+                .withExpensiveRenderer(object : LookupElementRenderer<LookupElement>() {
+                    override fun renderElement(element: LookupElement, presentation: LookupElementPresentation) {
 
-                            presentation.icon = ActionIcons.TAG
-                            presentation.itemText = tagDescription
+                        presentation.icon = ActionIcons.TAG
+                        presentation.itemText = tagDescription
 
-                            var typeText = tag.gFiles.firstOrNull{ it.name == filename }?.name ?: tag.gFiles.first().name
-                            if (tag.gtags.size > 1)
-                                typeText += """ (+${tag.gtags.size-1})"""
-                            presentation.typeText = typeText
-                        }
-                    })
+                        var typeText = tag.gFiles.firstOrNull{ it.name == filename }?.name ?: tag.gFiles.first().name
+                        if (tag.gtags.size > 1)
+                            typeText += """ (+${tag.gtags.size-1})"""
+                        presentation.typeText = typeText
+                    }
+                })
 
-                resultSet.addElement(PrioritizedLookupElement.withPriority(lookup, 100.0))
-            }
+            resultSet.addElement(PrioritizedLookupElement.withPriority(lookup, 100.0))
+        }
     }
 
     init {
