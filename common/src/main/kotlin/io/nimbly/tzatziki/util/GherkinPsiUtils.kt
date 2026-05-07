@@ -111,12 +111,25 @@ val GherkinFeature.tags: List<GherkinTag>
     }
 
 val GherkinStepsHolder.allTags: Set<GherkinTag>
-    get() = this.feature.tags.toSet()
-        .union(this.tags.toSet())
+    get() {
+        val featureTags = this.feature.tags
+        val holderTags = this.tags
+        val result = LinkedHashSet<GherkinTag>(featureTags.size + holderTags.size)
+        result.addAll(featureTags)
+        result.addAll(holderTags)
+        return result
+    }
 
 val GherkinStep.allTags: Set<GherkinTag>
-    get() = this.stepHolder.feature.tags.toSet()
-                .union(this.stepHolder.tags.toSet())
+    get() {
+        val holder = this.stepHolder
+        val featureTags = holder.feature.tags
+        val holderTags = holder.tags
+        val result = LinkedHashSet<GherkinTag>(featureTags.size + holderTags.size)
+        result.addAll(featureTags)
+        result.addAll(holderTags)
+        return result
+    }
 
 
 fun Project.getGherkinScope(): GlobalSearchScope {

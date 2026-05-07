@@ -90,7 +90,7 @@ class TzGherkinAnnotatorVisitor(private val myHolder: AnnotationHolder) : Gherki
                 highlight(param, GherkinHighlighter.OUTLINE_PARAMETER_SUBSTITUTION)
             }
         }
-        val braces = outline.node.getChildren(TokenSet.create(GherkinTokenTypes.STEP_PARAMETER_BRACE))
+        val braces = outline.node.getChildren(STEP_PARAMETER_BRACE_TOKEN_SET)
         for (brace in braces) {
             highlight(brace.psi, GherkinHighlighter.REGEXP_PARAMETER)
         }
@@ -146,6 +146,8 @@ class TzGherkinAnnotatorVisitor(private val myHolder: AnnotationHolder) : Gherki
     }
 
     companion object {
+        private val STEP_PARAMETER_BRACE_TOKEN_SET = TokenSet.create(GherkinTokenTypes.STEP_PARAMETER_BRACE)
+
         // LRU cache for compiled outline parameter patterns (avoids recompilation per keystroke)
         private val patternCache = object : LinkedHashMap<List<String>, Pattern>(16, 0.75f, true) {
             override fun removeEldestEntry(eldest: MutableMap.MutableEntry<List<String>, Pattern>?) = size > 64
