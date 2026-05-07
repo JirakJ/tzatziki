@@ -41,9 +41,7 @@ class TzCucumberStepInspection : GherkinInspection() {
                 if (step.parent !is GherkinStepsHolder)
                     return
 
-                val reference = step.references
-                    .filterIsInstance<CucumberStepReference>()
-                    .firstOrNull()
+                val reference = step.references.firstNotNullOfOrNull { it as? CucumberStepReference }
                     ?: return
 
                 val definition = reference.resolveToDefinition()

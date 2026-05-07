@@ -114,8 +114,11 @@ class TzCucumberStepReference(private val myStep: PsiElement, private val myRang
             ?: return ResolveResult.EMPTY_ARRAY
 
         val frameworks = CucumberJvmExtensionPoint.EP_NAME.extensionList
-        val stepVariants: Set<String> =
-            frameworks.mapNotNull { it.getStepName(myStep) }.toSet()
+        val stepVariants: HashSet<String> = HashSet(frameworks.size)
+        for (f in frameworks) {
+            val name = f.getStepName(myStep) ?: continue
+            stepVariants.add(name)
+        }
         if (stepVariants.isEmpty())
             return ResolveResult.EMPTY_ARRAY
 
@@ -123,9 +126,9 @@ class TzCucumberStepReference(private val myStep: PsiElement, private val myRang
         val stepDefinitions = CachedValuesManager.getCachedValue(featureFile) {
             val allStepDefinition: MutableList<AbstractStepDefinition> = ArrayList(32)
             for (e in frameworks) {
-                val def = e.loadStepsFor(featureFile, module)
-                if (def != null) {
-                    allStepDefinition.addAll(def.filterNotNull())
+                val def = e.loadStepsFor(featureFile, module) ?: continue
+                for (d in def) {
+                    if (d != null) allStepDefinition.add(d)
                 }
             }
             CachedValueProvider.Result.create<List<AbstractStepDefinition>>(
@@ -141,7 +144,7 @@ class TzCucumberStepReference(private val myStep: PsiElement, private val myRang
                 for (stepVariant in stepVariants) {
                     val element = stepDefinition.element
                     ProgressManager.checkCanceled()
-                    if (stepDefinition.matches(stepVariant!!) && element != null && !resolved.contains(element)) {
+                    if (stepDefinition.matches(stepVariant) && element != null && !resolved.contains(element)) {
                         resolved.add(element)
                         break
                     }

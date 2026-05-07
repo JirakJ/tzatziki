@@ -49,6 +49,8 @@ class TzUrlAnnotator : Annotator {
             return
 
         val text = element.text
+        // Skip if header has no markdown / HTML markers at all (common case).
+        if ('<' !in text && '[' !in text) return
         ANNOTATOR_REGEXES.forEach { reg ->
             reg.findAll(text)
                 .mapNotNull { it.groups.last() }
