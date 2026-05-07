@@ -20,11 +20,13 @@ class GherkinFileNode(p: Project, val file: GherkinFile, exp: Expression?) : Abs
     }
 
     override fun getChildren(): MutableCollection<out AbstractTreeNode<*>> {
-        return value.features
-            .filter { it.checkExpression(filterByTags) }
-            .map { GherkinFeatureNode(project, it, filterByTags) }
-            .sortedBy { it.toString()}
-            .toMutableList()
+        val result = ArrayList<GherkinFeatureNode>()
+        for (feature in value.features) {
+            if (!feature.checkExpression(filterByTags)) continue
+            result.add(GherkinFeatureNode(project, feature, filterByTags))
+        }
+        result.sortBy { it.toString() }
+        return result
     }
 
     override fun getRunConfiguration(): RunConfigurationProducer<*>? {

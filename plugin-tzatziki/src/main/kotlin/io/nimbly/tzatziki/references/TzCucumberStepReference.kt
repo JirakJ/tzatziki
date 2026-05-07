@@ -140,14 +140,14 @@ class TzCucumberStepReference(private val myStep: PsiElement, private val myRang
         val resolved = mutableSetOf<PsiElement>()
 
         for (stepDefinition in stepDefinitions) {
-            if (stepDefinition.supportsStep(myStep)) {
-                for (stepVariant in stepVariants) {
-                    val element = stepDefinition.element
-                    ProgressManager.checkCanceled()
-                    if (stepDefinition.matches(stepVariant) && element != null && !resolved.contains(element)) {
-                        resolved.add(element)
-                        break
-                    }
+            if (!stepDefinition.supportsStep(myStep)) continue
+            val element = stepDefinition.element ?: continue
+            if (resolved.contains(element)) continue
+            ProgressManager.checkCanceled()
+            for (stepVariant in stepVariants) {
+                if (stepDefinition.matches(stepVariant)) {
+                    resolved.add(element)
+                    break
                 }
             }
         }

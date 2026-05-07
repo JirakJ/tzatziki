@@ -16,9 +16,11 @@ class GherkinTagNode(p: Project, tag: String, val gherkinFiles: List<GherkinFile
     }
 
     override fun getChildren(): MutableCollection<out AbstractTreeNode<*>> {
-        return gherkinFiles
-            .filter { it.checkExpression(filterByTags) }
-            .map { GherkinFileNode(project, it, filterByTags) }
-            .toMutableList()
+        val result = ArrayList<GherkinFileNode>()
+        for (file in gherkinFiles) {
+            if (!file.checkExpression(filterByTags)) continue
+            result.add(GherkinFileNode(project, file, filterByTags))
+        }
+        return result
     }
 }

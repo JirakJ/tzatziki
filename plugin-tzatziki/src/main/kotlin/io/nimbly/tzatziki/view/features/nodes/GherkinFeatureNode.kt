@@ -25,12 +25,14 @@ class GherkinFeatureNode(p: Project, feature: GherkinFeature, exp: Expression?) 
     }
 
     override fun getChildren(): MutableCollection<out AbstractTreeNode<*>> {
-        return value.scenarios
-            .filter { it.scenarioKeyword != "Background" }
-            .filter { it.checkExpression(filterByTags) }
-            .map { GherkinScenarioNode(project, it, filterByTags) }
-            .sortedBy { it.toString()}
-            .toMutableList()
+        val result = ArrayList<GherkinScenarioNode>()
+        for (scenario in value.scenarios) {
+            if (scenario.scenarioKeyword == "Background") continue
+            if (!scenario.checkExpression(filterByTags)) continue
+            result.add(GherkinScenarioNode(project, scenario, filterByTags))
+        }
+        result.sortBy { it.toString() }
+        return result
     }
 
     override fun getRunConfiguration(): RunConfigurationProducer<*>? {
