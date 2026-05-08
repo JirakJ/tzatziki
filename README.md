@@ -40,9 +40,10 @@ _Token is known by Maxime HAMM :)_
 - Verify compatibility using task `runPluginVerifier` from `plugin` module
 
 ## Publishing a new release
-- Upgrade version in `./build.gradle`
-- Update change note in `./plugin-tzatziki/build.gradle`
+- Upgrade `pluginVersion` in `./gradle.properties`
+- Update change notes in `./build.gradle`
 - Update change note in `./plugin-i18n/build.gradle`
+- Keep Cucumber+ free: do not add a Marketplace `product-descriptor` unless a future ADR explicitly changes the distribution model.
 - Publish to marketplace 
   - Using task `plugin-tzatziki > Tasks > intellij > publishPlugin`
   - Using task `plugin-i18n > Tasks > intellij > publishPlugin`
@@ -50,5 +51,4 @@ _Token is known by Maxime HAMM :)_
 *Many thanks to Pierre-Michel BRET for his contribution, the great PDF generator, allowing to realize a complete layout with page numbers, summary, paragraphs management, etc.*
 
 Enjoy !
-
 

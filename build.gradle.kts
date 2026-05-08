@@ -3,8 +3,8 @@
 import java.net.URI
 
 allprojects {
-    group = "io.nimbly.tzatziki"
-    version = "18.3.0"
+    group = rootProject.providers.gradleProperty("pluginGroup").get()
+    version = rootProject.providers.gradleProperty("pluginVersion").get()
 }
 
 val notes by extra {"""
@@ -12,6 +12,7 @@ val notes by extra {"""
        <br/>
        Change notes :
        <ul> 
+         <li><b>18.4.0</b> JirakJ v2 fork: responsive live Gherkin editing optimizations, coalesced tag refreshes, file-scoped test annotations, ADR policy, and dependency cleanup. Plugin remains free.<br/>
          <li><b>18.3</b> Performance optimizations, Cucumber+ settings page, fix build compatibility with JDK 21 <br/>
          <li><b>18.2</b> IntelliJ IDEA 2026.1 compatibility</li>
          <li><b>18.1</b> IntelliJ IDEA 2025.2 compatibility</li>

@@ -66,6 +66,8 @@ tasks {
         changeNotes.set(notes)
     }
 
+    // No productDescriptor is configured: this Marketplace plugin remains free.
+
     buildSearchableOptions {
         enabled = false
     }
