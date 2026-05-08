@@ -57,6 +57,11 @@ class TzTestsResultsAnnotator : Annotator {
         if (TzTestRegistry.results.tests.isEmpty())
             return
 
+        val file = element.containingFile
+            ?: return
+        if (!TzTestRegistry.hasResults(file))
+            return
+
         when (element) {
             is GherkinStep -> annotateStep(element, holder)
             is GherkinTableRowImpl -> annotateRow(element, holder)
@@ -99,8 +104,18 @@ class TzTestsResultsAnnotator : Annotator {
         else {
 
             // Step having examples
-            val ignored = tests.count { it.isIgnored }
-            val ko = tests.count { it.isDefect && !it.isIgnored }
+            var ignored = 0
+            var ko = 0
+            var stacktraceCandidate: String? = null
+            for (test in tests) {
+                if (test.isIgnored) {
+                    ignored++
+                } else if (test.isDefect) {
+                    ko++
+                }
+                if (stacktraceCandidate == null && test.stacktrace != null)
+                    stacktraceCandidate = test.stacktrace
+            }
             val ok = tests.size - ignored - ko
             val textKey = when {
                 ignored == 0 && ko == 0 -> TEST_OK
@@ -114,7 +129,7 @@ class TzTestsResultsAnnotator : Annotator {
                     "$ko ${what}${if (ko>1) "s" else ""} with <u>failure</u>,<br/>" +
                     "$ignored ${what}${if (ignored>1) "s" else ""} <u>not executed</u>,<br/>" +
                     "$ok ${what}${if (ok>1) "s" else ""} <u>successful</u>"
-            stacktrace = tests.firstOrNull() { it.stacktrace!=null }?.stacktrace
+            stacktrace = stacktraceCandidate
         }
 
         // Add annotation

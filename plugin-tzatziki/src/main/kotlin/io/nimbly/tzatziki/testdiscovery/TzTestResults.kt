@@ -38,6 +38,7 @@ import org.jetbrains.plugins.cucumber.psi.*
 object TzTestRegistry {
 
     private var activeResults = TzTestResult()
+    private val filesWithResults = HashSet<PsiFile>()
     private val highlighters: MutableList<TzHighlight> = mutableListOf()
 
     fun refresh(results: TzTestResult) {
@@ -65,6 +66,7 @@ object TzTestRegistry {
         }
 
         this.activeResults = temp
+        rebuildFilesWithResults()
     }
 
     private fun highlight(element: GherkinPsiElement, tests: Set<SMTestProxy>): List<TzHighlight> {
@@ -140,6 +142,7 @@ object TzTestRegistry {
 
         // Retain all related to not-involved scenarios
         activeResults.tests.entries.removeIf { scenario == it.value.scenario }
+        rebuildFilesWithResults()
 
     }
 
@@ -152,14 +155,23 @@ object TzTestRegistry {
 
         // Retain all related to not-involved scenarios
         activeResults.tests.entries.removeIf { file == it.value.scenario?.containingFile }
+        rebuildFilesWithResults()
 
     }
 
     val results get() = activeResults
 
     fun hasResults(file: PsiFile): Boolean {
-        return activeResults.tests
-            .any { file != it.value.scenario?.containingFile }
+        return filesWithResults.contains(file)
+    }
+
+    private fun rebuildFilesWithResults() {
+        filesWithResults.clear()
+        for (item in activeResults.tests.values) {
+            val file = item.scenario?.containingFile
+                ?: continue
+            filesWithResults.add(file)
+        }
     }
 }
 
