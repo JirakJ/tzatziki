@@ -12,6 +12,8 @@ import com.intellij.psi.*
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.*
+import com.intellij.util.ui.update.MergingUpdateQueue
+import com.intellij.util.ui.update.Update
 import io.cucumber.tagexpressions.Expression
 import io.nimbly.tzatziki.util.*
 import org.jetbrains.plugins.cucumber.psi.GherkinFile
@@ -114,8 +116,8 @@ class TzFileService(val project: Project) : Disposable {
         // Get all tags
         val tags = findAllTags(project, project.getGherkinScope())
 
-        // Check if tags are still the same
-        val tagsUpdated = (tags == this.tags)
+        // Check if tags changed.
+        val tagsUpdated = tags != this.tags
 
         // Update and inform listeners
         if (updateListeners)
@@ -211,6 +213,14 @@ class TagFilterEvent(val tagsFilter: Expression?, source: Any) : EventObject(sou
 
 private class PsiChangeListener(val service: TzFileService) : PsiTreeChangeListener {
 
+    private val refreshQueue = MergingUpdateQueue(
+        "Tzatziki Gherkin tag refresh",
+        300,
+        true,
+        null,
+        DisposalService.getInstance(service.project)
+    )
+
     override fun beforeChildAddition(event: PsiTreeChangeEvent) = Unit
     override fun beforeChildRemoval(event: PsiTreeChangeEvent) = Unit
     override fun beforeChildReplacement(event: PsiTreeChangeEvent) = Unit
@@ -273,11 +283,20 @@ private class PsiChangeListener(val service: TzFileService) : PsiTreeChangeListe
     }
 
     fun refresh(structure: Boolean = false) {
-        DumbService.getInstance(service.project).smartInvokeLater {
-            PsiDocumentManager.getInstance(service.project).performLaterWhenAllCommitted() {
-                service.refreshTags(true, structure)
+        refreshQueue.queue(object : Update("refresh-gherkin-tags") {
+            override fun run() {
+                val project = service.project
+                if (project.isDisposed)
+                    return
+
+                DumbService.getInstance(project).smartInvokeLater {
+                    PsiDocumentManager.getInstance(project).performLaterWhenAllCommitted {
+                        if (!project.isDisposed)
+                            service.refreshTags(true, structure)
+                    }
+                }
             }
-        }
+        })
     }
 }
 

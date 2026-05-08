@@ -20,10 +20,22 @@
             url="https://github.com/maximehamm/tzatziki/issues">Maxime HAMM</vendor>
     <description><![CDATA[
 
-       <b>The best Cucumber user experience to run, edit, print Gherkin features... and develop with Java, Kotlin, Scala...</b><br/>
-       <br/>
+        <b>The best Cucumber user experience to run, edit, print Gherkin features... and develop with Java, Kotlin, Scala...</b><br/>
+        <br/>
 
-       <b><u>NEW</u> : Rewriting breakpoint supports (Java, Koltin, Scala only)</u></b><br/>
+        <b>Cucumber+ v2 — empowered by JirakJ</b><br/>
+        Focused on responsive live editing for large open Gherkin feature files.<br/>
+        <br/>
+
+        <b><u>v2 performance essentials</u></b><br/>
+        <ul>
+           <li>Coalesced Gherkin tag refreshes while typing, avoiding repeated project-wide rescans during edit bursts.</li>
+           <li>File-scoped test-result annotations so unrelated open feature files skip result-highlighting work.</li>
+           <li>Allocation-conscious completion, line-marker and table-editing paths for smoother feature authoring.</li>
+        </ul>
+        <br/>
+
+        <b><u>NEW</u> : Rewriting breakpoint supports (Java, Koltin, Scala only)</u></b><br/>
          ✓ Hightlighting the Gherkin step/example in progress when debugger in pause<br/>
          ✓ Add breakpoint from Gherkin : the debugger will stop only for selected step/example<br/>
          ✓ Add breakpoint from Java, Koltin, Scala : add a condition « "Cucumber+"!=null » to stop only for Gherkin step's having breakpoints <br/>
@@ -177,6 +189,7 @@
        <br/>
 
        <i>@author Maxime HAMM</i><br/>
+       <i>v2 empowered by JirakJ</i><br/>
        <a href="https://github.com/maximehamm/tzatziki">https://github.com/maximehamm/tzatziki</a><br/>
 
        <br/>
