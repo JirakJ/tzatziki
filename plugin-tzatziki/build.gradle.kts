@@ -40,7 +40,6 @@ intellij {
     plugins.set(listOf(
         "Gherkin:${versions["gherkin"]}",
         "Kotlin",
-        "org.intellij.intelliLang",
         "java",
         "JUnit",
         "cucumber-java:${versions["cucumberJava"]}",

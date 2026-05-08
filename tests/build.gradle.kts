@@ -8,7 +8,6 @@ intellij {
     plugins.set(listOf(
         "Gherkin:213.5744.223",
         "Kotlin",
-        "org.intellij.intelliLang",
         "java",
         "JUnit",
         "cucumber-java:213.5744.125",
